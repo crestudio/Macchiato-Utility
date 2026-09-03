@@ -5,15 +5,15 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-using VRSuya.Core;
-using static VRSuya.Core.Translator;
+using Macchiato.Core;
+using static Macchiato.Core.Translator;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class MaterialTemplate : EditorWindow {
 
@@ -60,7 +60,7 @@ namespace VRSuya.Utility {
 		public bool UpdateGPUInstancing = true;
 		public bool UpdateGlobalIllumination = true;
 
-		const string UndoGroupName = "VRSuya MaterialTemplate";
+		const string UndoGroupName = "Macchiato MaterialTemplate";
 		int UndoGroupIndex;
 
 		enum ShaderType {
@@ -86,9 +86,9 @@ namespace VRSuya.Utility {
 			SerializedTargetMaterials = SerializedMaterialTemplate.FindProperty("TargetMaterials");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/MaterialTemplate", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/MaterialTemplate", priority = 1000)]
 		static void CreateWindow() {
-			MaterialTemplate AppWindow = GetWindowWithRect<MaterialTemplate>(new Rect(0, 0, 450, 665), true, "VRSuya MaterialTemplate");
+			MaterialTemplate AppWindow = GetWindowWithRect<MaterialTemplate>(new Rect(0, 0, 450, 665), true, "Macchiato MaterialTemplate");
 			AppWindow.Initialize();
 		}
 
@@ -287,7 +287,7 @@ namespace VRSuya.Utility {
 							}
 							break;
 						default:
-							Debug.LogError($"[VRSuya] {TargetMaterial.shader.name} 쉐이더는 지원하지 않습니다!");
+							Debug.LogError($"[Macchiato] {TargetMaterial.shader.name} 쉐이더는 지원하지 않습니다!");
 							break;
 					}
 					if (GeneralTemplateInstance.UpdateGeneralPropertys(TargetMaterial)) {

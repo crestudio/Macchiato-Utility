@@ -4,14 +4,14 @@ using UnityEngine;
 using VRC.SDKBase;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
-	[AddComponentMenu("VRSuya/VRSuya GlobalTransform")]
-	[HelpURL("https://vrsuya.booth.pm/")]
+	[AddComponentMenu("Caramel Macchiato/Macchiato GlobalTransform")]
+	[HelpURL("https://macchiato.booth.pm/")]
 	[RequireComponent(typeof(Transform))]
 	public class GlobalTransform : MonoBehaviour, IEditorOnly { }
 }

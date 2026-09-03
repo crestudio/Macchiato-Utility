@@ -4,28 +4,28 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-using VRSuya.Core;
+using Macchiato.Core;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class AnimatorControllerController : EditorWindow {
 
-		[MenuItem("Assets/VRSuya/Animator/Write Defaults On", true)]
+		[MenuItem("Assets/Macchiato/Animator/Write Defaults On", true)]
 		static bool ValidateControllerOn() {
 			return IsAnimatorController(Selection.objects);
 		}
 
-		[MenuItem("Assets/VRSuya/Animator/Write Defaults Off", true)]
+		[MenuItem("Assets/Macchiato/Animator/Write Defaults Off", true)]
 		static bool ValidateControllerOff() {
 			return IsAnimatorController(Selection.objects);
 		}
 
-		[MenuItem("Assets/VRSuya/Animator/Write Defaults On", priority = 1000)]
+		[MenuItem("Assets/Macchiato/Animator/Write Defaults On", priority = 1000)]
 		static void RequestAnimatorWriteDefaultsOn() {
 			if (Selection.objects.Length > 0) {
 				int ModifiedCount = 0;
@@ -46,11 +46,11 @@ namespace VRSuya.Utility {
 					EditorUtility.ClearProgressBar();
 					AssetDatabase.Refresh();
 				}
-				Debug.Log($"[VRSuya] Modified write defaults on in {ModifiedCount} animator controllers");
+				Debug.Log($"[Macchiato] Modified write defaults on in {ModifiedCount} animator controllers");
 			}
 		}
 
-		[MenuItem("Assets/VRSuya/Animator/Write Defaults Off", priority = 1000)]
+		[MenuItem("Assets/Macchiato/Animator/Write Defaults Off", priority = 1000)]
 		static void RequestAnimatorWriteDefaultsOff() {
 			if (Selection.objects.Length > 0) {
 				int ModifiedCount = 0;
@@ -71,7 +71,7 @@ namespace VRSuya.Utility {
 					EditorUtility.ClearProgressBar();
 					AssetDatabase.Refresh();
 				}
-				Debug.Log($"[VRSuya] Modified write defaults off in {ModifiedCount} animator controllers");
+				Debug.Log($"[Macchiato] Modified write defaults off in {ModifiedCount} animator controllers");
 			}
 		}
 

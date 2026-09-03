@@ -8,18 +8,18 @@ using UnityEngine.SceneManagement;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 
-using VRSuya.Core;
+using Macchiato.Core;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class PhysBoneController : EditorWindow {
 
-		const string UndoGroupName = "VRSuya PhysBoneController";
+		const string UndoGroupName = "Macchiato PhysBoneController";
 		static int UndoGroupIndex;
 
 		static readonly Dictionary<HumanBodyBones, HumanBodyBones> BoneColliderPair = new Dictionary<HumanBodyBones, HumanBodyBones> {
@@ -68,7 +68,7 @@ namespace VRSuya.Utility {
 				HumanBodyBones.LeftUpperLeg, HumanBodyBones.RightUpperLeg } },
 		};
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Version/1.0", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Version/1.0", priority = 1000)]
 		static void ChangePhysBoneVersionTo1_0() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -80,10 +80,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Version to 1.0");
+			Debug.Log($"[Macchiato] Changed All PhysBone Version to 1.0");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Version/1.1", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Version/1.1", priority = 1000)]
 		static void ChangePhysBoneVersionTo1_1() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -95,18 +95,18 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Version to 1.1");
+			Debug.Log($"[Macchiato] Changed All PhysBone Version to 1.1");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Version/Debug Version", priority = 1100)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Version/Debug Version", priority = 1100)]
 		static void DebugLogPhysBoneComponets() {
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
 			foreach (VRCPhysBone TargetPhysBone in PhysBoneComponents) {
-				Debug.Log($"[VRSuya] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Current Version : {TargetPhysBone.version}");
+				Debug.Log($"[Macchiato] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Current Version : {TargetPhysBone.version}");
 			}
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/FoldOut/Closed", priority = 1001)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/FoldOut/Closed", priority = 1001)]
 		static void ClosePhysBoneFoldOut() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -124,10 +124,10 @@ namespace VRSuya.Utility {
 				if (IsDirty) EditorUtility.SetDirty(TargetPhysBone);
 				Undo.CollapseUndoOperations(UndoGroupIndex);
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone FoldOut to Closed");
+			Debug.Log($"[Macchiato] Changed All PhysBone FoldOut to Closed");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/FoldOut/Opened", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/FoldOut/Opened", priority = 1000)]
 		static void OpenPhysBoneFoldOut() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -145,10 +145,10 @@ namespace VRSuya.Utility {
 				if (IsDirty) EditorUtility.SetDirty(TargetPhysBone);
 				Undo.CollapseUndoOperations(UndoGroupIndex);
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone FoldOut to Opened");
+			Debug.Log($"[Macchiato] Changed All PhysBone FoldOut to Opened");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Gizmo/Hide", priority = 1001)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Gizmo/Hide", priority = 1001)]
 		static void HidePhysBoneGizmo() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -160,10 +160,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Gizmo to Hidden");
+			Debug.Log($"[Macchiato] Changed All PhysBone Gizmo to Hidden");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Gizmo/Show", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Gizmo/Show", priority = 1000)]
 		static void ShowPhysBoneGizmo() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -175,10 +175,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Gizmo to Show");
+			Debug.Log($"[Macchiato] Changed All PhysBone Gizmo to Show");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Immobile/All Motion", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Immobile/All Motion", priority = 1000)]
 		static void ChangePhysBoneImmobileToAllMotion() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -190,10 +190,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Immobile to All Motion");
+			Debug.Log($"[Macchiato] Changed All PhysBone Immobile to All Motion");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Immobile/World", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Immobile/World", priority = 1000)]
 		static void ChangePhysBoneImmobileToWorld() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -205,10 +205,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Immobile to World");
+			Debug.Log($"[Macchiato] Changed All PhysBone Immobile to World");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Animated/True", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Animated/True", priority = 1000)]
 		static void ChangePhysBoneAnimatedToTrue() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -220,10 +220,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Animated to True");
+			Debug.Log($"[Macchiato] Changed All PhysBone Animated to True");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Animated/False", priority = 1001)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Animated/False", priority = 1001)]
 		static void ChangePhysBoneAnimatedToFalse() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -235,22 +235,22 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Animated to False");
+			Debug.Log($"[Macchiato] Changed All PhysBone Animated to False");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Animated/Debug Animated", priority = 1100)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Animated/Debug Animated", priority = 1100)]
 		static void DebugLogPhysBoneAnimateds() {
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
 			foreach (VRCPhysBone TargetPhysBone in PhysBoneComponents) {
 				if (TargetPhysBone.isAnimated) {
-					Debug.LogWarning($"[VRSuya] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Is Animated : True");
+					Debug.LogWarning($"[Macchiato] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Is Animated : True");
 				} else {
-					Debug.Log($"[VRSuya] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Is Animated : False");
+					Debug.Log($"[Macchiato] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Is Animated : False");
 				}
 			}
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Reset/True", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Reset/True", priority = 1000)]
 		static void ChangePhysBoneResetToTrue() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -262,10 +262,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Reset to True");
+			Debug.Log($"[Macchiato] Changed All PhysBone Reset to True");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Reset/False", priority = 1001)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Reset/False", priority = 1001)]
 		static void ChangePhysBoneResetToFalse() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -277,22 +277,22 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Changed All PhysBone Reset to False");
+			Debug.Log($"[Macchiato] Changed All PhysBone Reset to False");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Reset/Debug Reset", priority = 1100)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Reset/Debug Reset", priority = 1100)]
 		static void DebugLogPhysBoneResets() {
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
 			foreach (VRCPhysBone TargetPhysBone in PhysBoneComponents) {
 				if (TargetPhysBone.resetWhenDisabled) {
-					Debug.LogWarning($"[VRSuya] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Reset When Disabled : True");
+					Debug.LogWarning($"[Macchiato] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Reset When Disabled : True");
 				} else {
-					Debug.Log($"[VRSuya] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Reset When Disabled : False");
+					Debug.Log($"[Macchiato] PhysBone Parent GameObject Name : {TargetPhysBone.name} / Reset When Disabled : False");
 				}
 			}
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Quest/Remove Colliders", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Quest/Remove Colliders", priority = 1000)]
 		static void EmptyPhysBoneColliders() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -304,10 +304,10 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Empty All PhysBone Colliders List");
+			Debug.Log($"[Macchiato] Empty All PhysBone Colliders List");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Quest/Remove Parameter", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Quest/Remove Parameter", priority = 1000)]
 		static void EmptyPhysBoneParameter() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			List<VRCPhysBone> PhysBoneComponents = GetPhysBoneComponents();
@@ -319,7 +319,7 @@ namespace VRSuya.Utility {
 					Undo.CollapseUndoOperations(UndoGroupIndex);
 				}
 			}
-			Debug.Log($"[VRSuya] Empty All PhysBone Parameter");
+			Debug.Log($"[Macchiato] Empty All PhysBone Parameter");
 		}
 
 		static List<VRCPhysBone> GetPhysBoneComponents() {
@@ -330,7 +330,7 @@ namespace VRSuya.Utility {
 			return SceneManager.GetActiveScene().GetRootGameObjects().SelectMany(gameObject => gameObject.GetComponentsInChildren<VRCPhysBoneColliderBase>(true)).ToList();
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Collider/Adjust Humanoid Collider", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Collider/Adjust Humanoid Collider", priority = 1000)]
 		static void AdjustHumanoidCollider() {
 			if (AvatarUtility.GetAvatarDescriptor()) {
 				GameObject AvatarObject = AvatarUtility.GetAvatarDescriptor().gameObject;
@@ -382,12 +382,12 @@ namespace VRSuya.Utility {
 						}
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
-					Debug.Log($"[VRSuya] Created Humanoid PhysBone Colliders");
+					Debug.Log($"[Macchiato] Created Humanoid PhysBone Colliders");
 				}
 			}
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Collider/Assign Humanoid Collider", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Collider/Assign Humanoid Collider", priority = 1000)]
 		static void AssignHumanoidCollider() {
 			if (AvatarUtility.GetAvatarDescriptor()) {
 				UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
@@ -412,7 +412,7 @@ namespace VRSuya.Utility {
 							}
 							if (!HasCollider) {
 								NewColliders.Add(null);
-								Debug.LogWarning($"[VRSuya] Not found {TargetHumanBodyBone.ToString()} collider assigned to {TargetPhysBone.name}");
+								Debug.LogWarning($"[Macchiato] Not found {TargetHumanBodyBone.ToString()} collider assigned to {TargetPhysBone.name}");
 							}
 						}
 						switch (KeyPair.Key) {
@@ -423,7 +423,7 @@ namespace VRSuya.Utility {
 									NewColliders.Add(FloorPhysBoneCollider);
 								} else {
 									NewColliders.Add(null);
-									Debug.LogWarning($"[VRSuya] Not found Floor collider assigned to {TargetPhysBone.name}");
+									Debug.LogWarning($"[Macchiato] Not found Floor collider assigned to {TargetPhysBone.name}");
 								}
 								break;
 							case "Breast":
@@ -435,7 +435,7 @@ namespace VRSuya.Utility {
 									NewColliders.Add(BreastPhysBoneCollider);
 								} else {
 									NewColliders.Add(null);
-									Debug.LogWarning($"[VRSuya] Not found Breast collider assigned to {TargetPhysBone.name}");
+									Debug.LogWarning($"[Macchiato] Not found Breast collider assigned to {TargetPhysBone.name}");
 								}
 								break;
 							case "Tail":
@@ -444,7 +444,7 @@ namespace VRSuya.Utility {
 									NewColliders.Add(TailPhysBoneCollider);
 								} else {
 									NewColliders.Add(null);
-									Debug.LogWarning($"[VRSuya] Not found Tail collider assigned to {TargetPhysBone.name}");
+									Debug.LogWarning($"[Macchiato] Not found Tail collider assigned to {TargetPhysBone.name}");
 								}
 								break;
 						}
@@ -456,11 +456,11 @@ namespace VRSuya.Utility {
 						}
 					}
 				}
-				Debug.Log($"[VRSuya] Assign All PhysBone Colliders");
+				Debug.Log($"[Macchiato] Assign All PhysBone Colliders");
 			}
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/PhysBone/Collider/Remove Hand Collider", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/PhysBone/Collider/Remove Hand Collider", priority = 1000)]
 		static void RemoveHandCollider() {
 			if (AvatarUtility.GetAvatarDescriptor()) {
 				UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
@@ -498,7 +498,7 @@ namespace VRSuya.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[VRSuya] Remove All Hand PhysBone Colliders");
+				Debug.Log($"[Macchiato] Remove All Hand PhysBone Colliders");
 			}
 		}
 	}

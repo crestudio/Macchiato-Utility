@@ -6,16 +6,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-using VRSuya.Core;
+using Macchiato.Core;
 
 using Random = UnityEngine.Random;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class ColorGenerator : ScriptableObject {
 
@@ -55,7 +55,7 @@ namespace VRSuya.Utility {
 
 		static ColorGenerator ColorGeneratorInstance;
 
-		const string UndoGroupName = "VRSuya ColorGenerator";
+		const string UndoGroupName = "Macchiato ColorGenerator";
 		int UndoGroupIndex;
 
 		void OnEnable() {
@@ -124,7 +124,7 @@ namespace VRSuya.Utility {
 						if (RimShadeColor != Color.black) TargetMaterial.SetColor("_RimShadeColor", RimShadeColor);
 						EditorUtility.SetDirty(TargetMaterial);
 						Undo.CollapseUndoOperations(UndoGroupIndex);
-						Debug.Log($"[VRSuya] {TargetMaterial.name} 머테리얼에 설정을 적용하였습니다");
+						Debug.Log($"[Macchiato] {TargetMaterial.name} 머테리얼에 설정을 적용하였습니다");
 					}
 				}
 			}
@@ -134,7 +134,7 @@ namespace VRSuya.Utility {
 			ColorDelta NewColorDelta = GetNewColorDelta();
 			ColorDeltaList.Add(NewColorDelta);
 			TargetColorDelta = NewColorDelta;
-			Debug.Log($"[VRSuya] {NewColorDelta.Name_EN} 설정을 생성하였습니다");
+			Debug.Log($"[Macchiato] {NewColorDelta.Name_EN} 설정을 생성하였습니다");
 		}
 
 		ColorDelta GetNewColorDelta() {
@@ -161,7 +161,7 @@ namespace VRSuya.Utility {
 		}
 
 		void LoadColorDeltas() {
-			string ColorDeltaPath = Path.Combine(Application.dataPath, "VRSuya/ColorDelta");
+			string ColorDeltaPath = Path.Combine(Application.dataPath, "Caramel Macchiato/ColorDelta");
 			if (!Directory.Exists(ColorDeltaPath)) {
 				Directory.CreateDirectory(ColorDeltaPath);
 				CreateSampleColorDelta();
@@ -176,7 +176,7 @@ namespace VRSuya.Utility {
 
 		public void LoadColorDelta() {
 			string LoadPath = EditorUtility.OpenFilePanel("ColorDelta JSON 파일 불러오기", Application.dataPath, "json");
-			string ColorDeltaPath = Path.Combine(Application.dataPath, "VRSuya/ColorDelta");
+			string ColorDeltaPath = Path.Combine(Application.dataPath, "Caramel Macchiato/ColorDelta");
 			if (!Directory.Exists(ColorDeltaPath)) {
 				Directory.CreateDirectory(ColorDeltaPath);
 			}
@@ -192,7 +192,7 @@ namespace VRSuya.Utility {
 		}
 
 		public void SaveColorDelta() {
-			string SavePath = Path.Combine(Application.dataPath, "VRSuya/ColorDelta");
+			string SavePath = Path.Combine(Application.dataPath, "Caramel Macchiato/ColorDelta");
 			if (!Directory.Exists(SavePath)) Directory.CreateDirectory(SavePath);
 			string ColorDeltaJSON = JsonUtility.ToJson(TargetColorDelta, true);
 			string JSONFilePath = Path.Combine(SavePath, TargetColorDelta.Name_EN + ".json");

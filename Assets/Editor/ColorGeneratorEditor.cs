@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEditor;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class ColorGeneratorEditor : EditorWindow {
 
@@ -57,9 +57,9 @@ namespace VRSuya.Utility {
 			SerializedTargetMaterials = SerializedColorGenerator.FindProperty("TargetMaterials");
 		}
 
-		[MenuItem("Tools/VRSuya/Utility/ColorGenerator", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/ColorGenerator", priority = 1000)]
 		static void CreateWindow() {
-			ColorGeneratorEditor AppWindow = GetWindowWithRect<ColorGeneratorEditor>(new Rect(0, 0, 550, 425), true, "VRSuya ColorGenerator");
+			ColorGeneratorEditor AppWindow = GetWindowWithRect<ColorGeneratorEditor>(new Rect(0, 0, 550, 425), true, "Macchiato ColorGenerator");
 		}
 
 		void OnGUI() {

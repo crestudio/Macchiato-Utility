@@ -3,14 +3,14 @@
 using UnityEngine;
 using UnityEditor;
 
-using static VRSuya.Core.Translator;
+using static Macchiato.Core.Translator;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
     [CustomEditor(typeof(TextureReplacer))]
     public class TextureReplacerEditor : Editor {

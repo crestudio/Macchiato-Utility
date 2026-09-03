@@ -1,14 +1,13 @@
 {
-  "name": "com.vrsuya.utility",
-  "version": "1.2.0",
-  "displayName": "VRSuya - Utility",
-  "description": "Utility add-on for the Unity Editor, designed for VRChat",
-  "unity": "2019.4",
-  "documentationUrl": "https://github.com/VRSuya/VRSuya-Utility/blob/main/README.md",
-  "changelogUrl": "https://github.com/VRSuya/VRSuya-Utility/blob/main/README.md",
-  "licensesUrl": "https://github.com/VRSuya/VRSuya-Utility/blob/main/LICENSE",
+  "name": "macchiato.utility",
+  "version": "1.0.0",
+  "displayName": "Macchiato - Utility",
+  "description": "Unity Editor Utility Add-on for VRChat",
+  "unity": "2022.3",
+  "documentationUrl": "https://github.com/crestudio/Macchiato-Utility/blob/main/README.md",
+  "changelogUrl": "https://github.com/crestudio/Macchiato-Utility/blob/main/README.md",
+  "licensesUrl": "https://github.com/crestudio/Macchiato-Utility/blob/main/LICENSE",
   "keywords": [
-    "VRSuya",
     "VRChat"
   ],
   "author": {
@@ -16,10 +15,10 @@
     "email": "crestudioplus@gmail.com",
     "url": "https://github.com/crestudio"
   },
-  "url": "https://github.com/VRSuya/VRSuya-Utility",
-  "repo": "https://vrsuya.com/vpm/vpm.json",
+  "url": "https://github.com/crestudio/Macchiato-Utility",
+  "repo": "https://macchiato.kr/vpm/vpm.json",
   "vpmDependencies": {
     "com.vrchat.avatars": ">=3.0.9",
-	  "com.vrsuya.core": ">=1.0.0"
+	  "macchiato.core": ">=1.0.0"
   }
 }

@@ -7,18 +7,18 @@ using UnityEngine.Rendering;
 
 using VRC.SDKBase;
 
-using VRSuya.Core;
+using Macchiato.Core;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class MeshRendererController : ScriptableObject {
 
-		const string UndoGroupName = "VRSuya MeshRendererController";
+		const string UndoGroupName = "Macchiato MeshRendererController";
 		int UndoGroupIndex;
 
 		public void RequestUpdateAvatarRenders() {
@@ -85,7 +85,7 @@ namespace VRSuya.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[VRSuya] Changed {AvatarGameObject.name} Renderer Settings");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Renderer Settings");
 			}
 		}
 
@@ -109,7 +109,7 @@ namespace VRSuya.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[VRSuya] Changed {AvatarGameObject.name} Bounds");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Bounds");
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace VRSuya.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[VRSuya] Changed {AvatarGameObject.name} Shadow Casting Mode");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Shadow Casting Mode");
 			}
 		}
 
@@ -167,7 +167,7 @@ namespace VRSuya.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[VRSuya] Changed {AvatarGameObject.name} LightProbe Usage Mode");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} LightProbe Usage Mode");
 			}
 		}
 
@@ -193,7 +193,7 @@ namespace VRSuya.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[VRSuya] Changed {AvatarGameObject.name} AnchorOverride");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} AnchorOverride");
 			}
 		}
 

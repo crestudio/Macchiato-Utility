@@ -8,18 +8,18 @@ using UnityEngine;
 
 using VRC.SDKBase;
 
-using VRSuya.Core;
+using Macchiato.Core;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	[ExecuteInEditMode]
-	[AddComponentMenu("VRSuya/VRSuya TextureReplacer")]
-	[HelpURL("https://vrsuya.booth.pm/")]
+	[AddComponentMenu("Caramel Macchiato/Macchiato TextureReplacer")]
+	[HelpURL("https://macchiato.booth.pm/")]
 	public class TextureReplacer : MonoBehaviour, IEditorOnly {
 
 		[Serializable]
@@ -55,7 +55,7 @@ namespace VRSuya.Utility {
 		public GameObject AvatarGameObject = null;
 		public Material[] AvatarMaterials = new Material[0];
 
-		const string UndoGroupName = "VRSuya TextureReplacer";
+		const string UndoGroupName = "Macchiato TextureReplacer";
 		int UndoGroupIndex;
 
 		void Reset() {
@@ -131,7 +131,7 @@ namespace VRSuya.Utility {
 					}
 				}
 			}
-			Debug.Log($"[VRSuya] {ModifiedCount} textures have been replaced");
+			Debug.Log($"[Macchiato] {ModifiedCount} textures have been replaced");
 		}
 
 		TextureExpression[] AddAvatarTextureDetails(GameObject TargetGameObject) {

@@ -1,10 +1,10 @@
 {
-    "name": "com.vrsuya.utility.Editor",
+    "name": "macchiato.utility.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:75c1da3e60adb8b4e808ca4aa021acc2",
         "GUID:5718fb738711cd34ea54e9553040911d",
-        "GUID:0bae3e2f09a0c454da701a2e8b59d048"
+        "GUID:bb181fafa659999449e5ae1cc590f407",
+        "GUID:73dfdb5c996426d4fb80b979f581acdd"
     ],
     "includePlatforms": [
         "Editor"

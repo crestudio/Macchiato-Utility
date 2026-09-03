@@ -2,11 +2,11 @@ using UnityEngine;
 using UnityEditor;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class ColorGradientUtility : EditorWindow {
 
@@ -15,9 +15,9 @@ namespace VRSuya.Utility {
 
 		Color BaseColor, Shadow1Color, Shadow2Color, Shadow3Color;
 
-		[MenuItem("Tools/VRSuya/Utility/OKLCHColorGradient", priority = 1000)]
+		[MenuItem("Tools/Macchiato/Utility/OKLCHColorGradient", priority = 1000)]
 		static void CreateWindow() {
-			ColorGradientUtility AppWindow = GetWindow<ColorGradientUtility>(true, "VRSuya OKLCHGradientPicker", true);
+			ColorGradientUtility AppWindow = GetWindow<ColorGradientUtility>(true, "Macchiato OKLCHGradientPicker", true);
 			AppWindow.minSize = new Vector2(300, 200);
 		}
 
@@ -52,7 +52,7 @@ namespace VRSuya.Utility {
 				Shadow1Color = LCHtoRGB(InterpolateLCH(LCHStart, LCHEnd, 0.33f));
 				Shadow2Color = LCHtoRGB(InterpolateLCH(LCHStart, LCHEnd, 0.66f));
 			} else {
-				Debug.LogError($"[VRSuya] HEX 형식이 올바르지 않습니다! (예: #FFFFFF)");
+				Debug.LogError($"[Macchiato] HEX 형식이 올바르지 않습니다! (예: #FFFFFF)");
 			}
 		}
 

@@ -8,18 +8,18 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 
-using VRSuya.Core;
+using Macchiato.Core;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	[ExecuteInEditMode]
-	[AddComponentMenu("VRSuya/VRSuya SkirtColliderGenerator")]
-	[HelpURL("https://vrsuya.booth.pm/")]
+	[AddComponentMenu("Caramel Macchiato/Macchiato SkirtColliderGenerator")]
+	[HelpURL("https://macchiato.booth.pm/")]
 	public class SkirtColliderGenerator : MonoBehaviour, IEditorOnly {
 
 		public Vector3 TopCirclePoint_12 = new Vector3(0f, 0.976f, 0.0865f);
@@ -77,7 +77,7 @@ namespace VRSuya.Utility {
 		Vector3[] TopCircle;
 		Vector3[] BottomCircle;
 
-		const string UndoGroupName = "VRSuya SkirtColliderGenerator";
+		const string UndoGroupName = "Macchiato SkirtColliderGenerator";
 		int UndoGroupIndex;
 
 		void Start() {
@@ -156,7 +156,7 @@ namespace VRSuya.Utility {
 				EditorUtility.SetDirty(NewCollider);
 				Undo.CollapseUndoOperations(UndoGroupIndex);
 			}
-			Debug.Log($"[VRSuya] Generated {ColliderCount} PhysBone Colliders");
+			Debug.Log($"[Macchiato] Generated {ColliderCount} PhysBone Colliders");
 		}
 
 		Vector3 GetInterpolatedPosition(Vector3[] TargetCircle, float TargetAngle) {

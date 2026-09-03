@@ -2,17 +2,17 @@
 using UnityEditor;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	[CustomEditor(typeof(GlobalTransform))]
 	[CanEditMultipleObjects]
 	public class GlobalTransformEditor : Editor {
 
-		const string UndoGroupName = "VRSuya Global Transform";
+		const string UndoGroupName = "Macchiato Global Transform";
 
 		public override void OnInspectorGUI() {
 			GlobalTransform TargetGlobalTransform = (GlobalTransform)target;

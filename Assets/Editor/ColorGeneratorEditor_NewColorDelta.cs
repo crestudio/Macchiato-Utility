@@ -2,11 +2,11 @@
 using UnityEditor;
 
 /*
- * VRSuya Utility
- * Contact : vrsuya@gmail.com // Twitter : https://twitter.com/VRSuya
+ * Macchiato Utility
+ * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
  */
 
-namespace VRSuya.Utility {
+namespace Macchiato.Utility {
 
 	public class ColorGeneratorEditor_NewColorDelta : EditorWindow {
 
@@ -46,7 +46,7 @@ namespace VRSuya.Utility {
 		}
 
 		public static void CreateWindow() {
-			ColorGeneratorEditor_NewColorDelta AppWindow = GetWindowWithRect<ColorGeneratorEditor_NewColorDelta>(new Rect(0, 0, 365, 435), true, "VRSuya NewColorDelta");
+			ColorGeneratorEditor_NewColorDelta AppWindow = GetWindowWithRect<ColorGeneratorEditor_NewColorDelta>(new Rect(0, 0, 365, 435), true, "Macchiato NewColorDelta");
 		}
 
 		void OnGUI() {
