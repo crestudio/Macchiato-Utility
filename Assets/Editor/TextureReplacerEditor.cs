@@ -71,15 +71,15 @@ namespace Macchiato.Utility {
 							SerializedProperty OriginMaterialProperty = MaterialProperty.GetArrayElementAtIndex(MaterialIndex);
 							SerializedProperty OriginMaterial = OriginMaterialProperty.FindPropertyRelative("OriginMaterial");
 							SerializedProperty OriginProperty = OriginMaterialProperty.FindPropertyRelative("PropertyName");
-							string[] StringPropertys = new string[OriginProperty.arraySize];
+							string[] StringProperties = new string[OriginProperty.arraySize];
 							for (int PropertyIndex = 0; PropertyIndex < OriginProperty.arraySize; PropertyIndex++) {
 								SerializedProperty StringProperty = OriginProperty.GetArrayElementAtIndex(PropertyIndex);
-								StringPropertys[PropertyIndex] = StringProperty.stringValue;
+								StringProperties[PropertyIndex] = StringProperty.stringValue;
 							}
 							GUI.enabled = false;
 							EditorGUILayout.PropertyField(OriginMaterial, new GUIContent(string.Empty));
 							GUI.enabled = true;
-							EditorGUILayout.LabelField(String.Join(Environment.NewLine, StringPropertys));
+							EditorGUILayout.LabelField(String.Join(Environment.NewLine, StringProperties));
 							EditorGUILayout.EndHorizontal();
 							EditorGUI.indentLevel--;
 						}

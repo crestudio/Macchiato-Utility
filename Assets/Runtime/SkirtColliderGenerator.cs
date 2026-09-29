@@ -82,14 +82,14 @@ namespace Macchiato.Utility {
 
 		void Start() {
 			GetHumanoidTransform();
-			UpdatePropertys();
+			UpdateProperties();
 		}
 
 		void OnValidate() {
-			UpdatePropertys();
+			UpdateProperties();
 		}
 
-		void UpdatePropertys() {
+		void UpdateProperties() {
 			TopCircle = new Vector3[] { TopCirclePoint_12, TopCirclePoint_3, TopCirclePoint_6, TopCirclePoint_9 };
 			BottomCircle = new Vector3[] { BottomCirclePoint_12, BottomCirclePoint_3, BottomCirclePoint_6, BottomCirclePoint_9 };
 			ColliderCount = 4 + SampleCount * 4;

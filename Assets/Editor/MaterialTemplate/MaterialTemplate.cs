@@ -54,7 +54,7 @@ namespace Macchiato.Utility {
 		public bool UpdateUTSNormalMap = true;
 		public bool UpdateUTSBasicShading = true;
 		public bool UpdateUTSLightColor = true;
-		public bool UpdateUTSEnvironmentalLightingPropertys = true;
+		public bool UpdateUTSEnvironmentalLightingProperties = true;
 
 		public bool UpdateRenderQueue = true;
 		public bool UpdateGPUInstancing = true;
@@ -124,7 +124,7 @@ namespace Macchiato.Utility {
 			GUI.backgroundColor = Color.cyan;
 			GUI.enabled = IsReadyToUpdate();
 			if (GUILayout.Button(GetTranslatedString("String_Update"), GUILayout.Height(40f))) {
-				UpdateMaterialPropertys();
+				UpdateMaterialProperties();
 				Repaint();
 			}
 			GUI.enabled = true;
@@ -257,7 +257,7 @@ namespace Macchiato.Utility {
 			return TargetMaterials.Length > 0;
 		}
 
-		public bool UpdateMaterialPropertys() {
+		public bool UpdateMaterialProperties() {
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			bool IsModified = false;
 			lilToonTemplate lilToonTemplateInstance = new lilToonTemplate();
@@ -269,19 +269,19 @@ namespace Macchiato.Utility {
 					Undo.RecordObject(TargetMaterial, UndoGroupName);
 					switch (GetShaderType(TargetMaterial)) {
 						case ShaderType.lilToon:
-							if (lilToonTemplateInstance.UpdatelilToonPropertys(TargetMaterial)) {
+							if (lilToonTemplateInstance.UpdatelilToonProperties(TargetMaterial)) {
 								Undo.CollapseUndoOperations(UndoGroupIndex);
 								IsModified = true;
 							}
 							break;
 						case ShaderType.poiyomi:
-							if (poiyomiTemplateInstance.UpdatepoiyomiPropertys(TargetMaterial)) {
+							if (poiyomiTemplateInstance.UpdatepoiyomiProperties(TargetMaterial)) {
 								Undo.CollapseUndoOperations(UndoGroupIndex);
 								IsModified = true;
 							}
 							break;
 						case ShaderType.UnityChanToonShader:
-							if (UTSTemplateInstance.UpdateUnityChanToonShaderPropertys(TargetMaterial)) {
+							if (UTSTemplateInstance.UpdateUnityChanToonShaderProperties(TargetMaterial)) {
 								Undo.CollapseUndoOperations(UndoGroupIndex);
 								IsModified = true;
 							}
@@ -290,7 +290,7 @@ namespace Macchiato.Utility {
 							Debug.LogError($"[Macchiato] {TargetMaterial.shader.name} 쉐이더는 지원하지 않습니다!");
 							break;
 					}
-					if (GeneralTemplateInstance.UpdateGeneralPropertys(TargetMaterial)) {
+					if (GeneralTemplateInstance.UpdateGeneralProperties(TargetMaterial)) {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 						IsModified = true;
 					}

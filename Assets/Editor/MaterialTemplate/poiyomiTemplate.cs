@@ -10,7 +10,7 @@ namespace Macchiato.Utility {
 
 	internal class poiyomiTemplate : MaterialTemplate {
 
-		internal bool UpdatepoiyomiPropertys(Material TargetMaterial) {
+		internal bool UpdatepoiyomiProperties(Material TargetMaterial) {
 			bool IsModified = false;
 			if (IsModified) {
 				EditorUtility.SetDirty(TargetMaterial);

@@ -10,16 +10,16 @@ namespace Macchiato.Utility {
 
 	internal class GeneralTemplate : MaterialTemplate {
 
-		internal bool UpdateGeneralPropertys(Material TargetMaterial) {
+		internal bool UpdateGeneralProperties(Material TargetMaterial) {
 			bool IsModified = false;
 			if (UpdateRenderQueue) {
-				if (UpdateRenderQueuePropertys(TargetMaterial)) IsModified = true;
+				if (UpdateRenderQueueProperties(TargetMaterial)) IsModified = true;
 			}
 			if (UpdateGPUInstancing) {
-				if (UpdateGPUInstancingPropertys(TargetMaterial)) IsModified = true;
+				if (UpdateGPUInstancingProperties(TargetMaterial)) IsModified = true;
 			}
 			if (UpdateGlobalIllumination) {
-				if (UpdateGlobalIlluminationPropertys(TargetMaterial)) IsModified = true;
+				if (UpdateGlobalIlluminationProperties(TargetMaterial)) IsModified = true;
 			}
 			if (IsModified) {
 				EditorUtility.SetDirty(TargetMaterial);
@@ -28,28 +28,28 @@ namespace Macchiato.Utility {
 			return false;
 		}
 
-		bool UpdateRenderQueuePropertys(Material TargetMaterial) {
-			bool IsDrity = false;
+		bool UpdateRenderQueueProperties(Material TargetMaterial) {
+			bool IsDirty = false;
 			bool IsTransparent = TargetMaterial.shader.name.Contains("Transparent");
 			int RenderQueue = (!IsTransparent) ? -1 : 3000;
-			if (TargetMaterial.renderQueue != RenderQueue) { TargetMaterial.renderQueue = RenderQueue; IsDrity = true; }
-			return IsDrity;
+			if (TargetMaterial.renderQueue != RenderQueue) { TargetMaterial.renderQueue = RenderQueue; IsDirty = true; }
+			return IsDirty;
 		}
 
-		bool UpdateGPUInstancingPropertys(Material TargetMaterial) {
-			bool IsDrity = false;
+		bool UpdateGPUInstancingProperties(Material TargetMaterial) {
+			bool IsDirty = false;
 			bool EnableInstancingVariants = true;
-			if (TargetMaterial.enableInstancing != EnableInstancingVariants) { TargetMaterial.enableInstancing = EnableInstancingVariants; IsDrity = true; }
-			return IsDrity;
+			if (TargetMaterial.enableInstancing != EnableInstancingVariants) { TargetMaterial.enableInstancing = EnableInstancingVariants; IsDirty = true; }
+			return IsDirty;
 		}
 
-		bool UpdateGlobalIlluminationPropertys(Material TargetMaterial) {
-			bool IsDrity = false;
+		bool UpdateGlobalIlluminationProperties(Material TargetMaterial) {
+			bool IsDirty = false;
 			MaterialGlobalIlluminationFlags GlobalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
 			bool DoubleSidedGI = true;
-			if (TargetMaterial.globalIlluminationFlags != GlobalIlluminationFlags) { TargetMaterial.globalIlluminationFlags = GlobalIlluminationFlags; IsDrity = true; }
-			if (TargetMaterial.doubleSidedGI != DoubleSidedGI) { TargetMaterial.doubleSidedGI = DoubleSidedGI; IsDrity = true; }
-			return IsDrity;
+			if (TargetMaterial.globalIlluminationFlags != GlobalIlluminationFlags) { TargetMaterial.globalIlluminationFlags = GlobalIlluminationFlags; IsDirty = true; }
+			if (TargetMaterial.doubleSidedGI != DoubleSidedGI) { TargetMaterial.doubleSidedGI = DoubleSidedGI; IsDirty = true; }
+			return IsDirty;
 		}
 	}
 }
