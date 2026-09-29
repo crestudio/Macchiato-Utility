@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using System;
+
+using UnityEditor;
 using UnityEngine;
 
 /*
@@ -8,23 +10,41 @@ using UnityEngine;
 
 namespace Macchiato.Utility {
 
-	internal class UTSTemplate : MaterialTemplate {
+	[Serializable]
+	public class UTSTemplateOption {
+
+		public bool UpdateUTSTextureShared = false;
+		public bool UpdateUTSNormalMap = false;
+		public bool UpdateUTSBasicShading = false;
+		public bool UpdateUTSLightColor = false;
+		public bool UpdateUTSEnvironmentalLightingProperties = false;
+	}
+
+	internal class UTSTemplate {
+
+		readonly UTSTemplateOption TargetTemplateOption;
+		readonly Material ReferenceMaterial;
+
+		internal UTSTemplate(UTSTemplateOption NewTemplateOption, Material NewReferenceMaterial) {
+			TargetTemplateOption = NewTemplateOption;
+			ReferenceMaterial = NewReferenceMaterial;
+		}
 
 		internal bool UpdateUnityChanToonShaderProperties(Material TargetMaterial) {
 			bool IsModified = false;
-			if (UpdateUTSTextureShared) {
+			if (TargetTemplateOption.UpdateUTSTextureShared) {
 				if (UpdateTextureSharedProperties(TargetMaterial)) IsModified = true;
 			}
-			if (UpdateUTSNormalMap) {
+			if (TargetTemplateOption.UpdateUTSNormalMap) {
 				if (UpdateNormalMapProperties(TargetMaterial)) IsModified = true;
 			}
-			if (UpdateUTSBasicShading) {
+			if (TargetTemplateOption.UpdateUTSBasicShading) {
 				if (UpdateBasicShadingProperties(TargetMaterial)) IsModified = true;
 			}
-			if (UpdateUTSLightColor) {
+			if (TargetTemplateOption.UpdateUTSLightColor) {
 				if (UpdateLightColorProperties(TargetMaterial)) IsModified = true;
 			}
-			if (UpdateUTSEnvironmentalLightingProperties) {
+			if (TargetTemplateOption.UpdateUTSEnvironmentalLightingProperties) {
 				if (UpdateEnvironmentalLightingProperties(TargetMaterial)) IsModified = true;
 			}
 			if (IsModified) {

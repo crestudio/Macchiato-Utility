@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using System;
+
+using UnityEditor;
 using UnityEngine;
 
 /*
@@ -8,17 +10,33 @@ using UnityEngine;
 
 namespace Macchiato.Utility {
 
-	internal class GeneralTemplate : MaterialTemplate {
+	[Serializable]
+	public class GeneralTemplateOption {
+
+		public bool UpdateRenderQueue = false;
+		public bool UpdateGPUInstancing = false;
+		public bool UpdateGlobalIllumination = false;
+	}
+
+	internal class GeneralTemplate {
+
+		readonly GeneralTemplateOption TargetTemplateOption;
+		readonly Material ReferenceMaterial;
+
+		internal GeneralTemplate(GeneralTemplateOption NewTemplateOption, Material NewReferenceMaterial) {
+			TargetTemplateOption = NewTemplateOption;
+			ReferenceMaterial = NewReferenceMaterial;
+		}
 
 		internal bool UpdateGeneralProperties(Material TargetMaterial) {
 			bool IsModified = false;
-			if (UpdateRenderQueue) {
+			if (TargetTemplateOption.UpdateRenderQueue) {
 				if (UpdateRenderQueueProperties(TargetMaterial)) IsModified = true;
 			}
-			if (UpdateGPUInstancing) {
+			if (TargetTemplateOption.UpdateGPUInstancing) {
 				if (UpdateGPUInstancingProperties(TargetMaterial)) IsModified = true;
 			}
-			if (UpdateGlobalIllumination) {
+			if (TargetTemplateOption.UpdateGlobalIllumination) {
 				if (UpdateGlobalIlluminationProperties(TargetMaterial)) IsModified = true;
 			}
 			if (IsModified) {
@@ -29,11 +47,11 @@ namespace Macchiato.Utility {
 		}
 
 		bool UpdateRenderQueueProperties(Material TargetMaterial) {
-			bool IsDirty = false;
-			bool IsTransparent = TargetMaterial.shader.name.Contains("Transparent");
-			int RenderQueue = (!IsTransparent) ? -1 : 3000;
-			if (TargetMaterial.renderQueue != RenderQueue) { TargetMaterial.renderQueue = RenderQueue; IsDirty = true; }
-			return IsDirty;
+			bool IsTransparent = TargetMaterial.shader.name.Contains("Transparent", StringComparison.OrdinalIgnoreCase);
+			int ExpectedRenderQueue = IsTransparent ? 3000 : TargetMaterial.shader.renderQueue;
+			if (TargetMaterial.renderQueue == ExpectedRenderQueue) return false;
+			TargetMaterial.renderQueue = IsTransparent ? 3000 : -1;
+			return true;
 		}
 
 		bool UpdateGPUInstancingProperties(Material TargetMaterial) {

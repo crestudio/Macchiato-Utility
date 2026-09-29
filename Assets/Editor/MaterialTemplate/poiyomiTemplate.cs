@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using System;
+
+using UnityEditor;
 using UnityEngine;
 
 /*
@@ -8,7 +10,20 @@ using UnityEngine;
 
 namespace Macchiato.Utility {
 
-	internal class poiyomiTemplate : MaterialTemplate {
+	[Serializable]
+	public class poiyomiTemplateOption {
+
+	}
+
+	internal class poiyomiTemplate {
+
+		readonly poiyomiTemplateOption TargetTemplateOption;
+		readonly Material ReferenceMaterial;
+
+		internal poiyomiTemplate(poiyomiTemplateOption NewTemplateOption, Material NewReferenceMaterial) {
+			TargetTemplateOption = NewTemplateOption;
+			ReferenceMaterial = NewReferenceMaterial;
+		}
 
 		internal bool UpdatepoiyomiProperties(Material TargetMaterial) {
 			bool IsModified = false;

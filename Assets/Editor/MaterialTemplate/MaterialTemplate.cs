@@ -21,47 +21,14 @@ namespace Macchiato.Utility {
 		public Material ReferenceMaterial;
 		public Material[] TargetMaterials;
 
-		public Color TargetShadow1Color = Color.white;
-		public Color TargetShadow2Color = Color.white;
-		public Color TargetShadow3Color = Color.white;
-		public Color TargetShadowBorderColor = Color.white;
-		public Color TargetRimShadeColor = Color.white;
-		public Color TargetBacklightColor = Color.white;
-		public Color TargetReflectionColor = Color.white;
-		public Color TargetRimLightColor = Color.white;
-		public Color TargetOutlineColor = Color.white;
-		public Color TargetOutlineHighlightColor = Color.white;
-
-		public bool UpdatelilToonBasic = true;
-		public bool UpdatelilToonLighting = true;
-		public bool UpdatelilToonShadow = true;
-		public bool UpdatelilToonReceiveShadow = true;
-		public bool UpdatelilToonBackfaceMask = true;
-		public bool UpdatelilToonBacklight = true;
-		public bool ForcelilToonShadow = false;
-		public bool ForcelilToonRimShade = false;
-		public bool ForcelilToonBacklight = false;
-		public bool ForcelilToonReflection = false;
-		public bool ForcelilToonRimLight = false;
-		public bool UpdatelilToonShadowColor = false;
-		public bool UpdatelilToonRimShadeColor = false;
-		public bool UpdatelilToonBacklightColor = false;
-		public bool UpdatelilToonReflectionColor = false;
-		public bool UpdatelilToonRimLightColor = false;
-		public bool UpdatelilToonOutlineColor = false;
-
-		public bool UpdateUTSTextureShared = true;
-		public bool UpdateUTSNormalMap = true;
-		public bool UpdateUTSBasicShading = true;
-		public bool UpdateUTSLightColor = true;
-		public bool UpdateUTSEnvironmentalLightingProperties = true;
-
-		public bool UpdateRenderQueue = true;
-		public bool UpdateGPUInstancing = true;
-		public bool UpdateGlobalIllumination = true;
+		public lilToonTemplateOption TargetlilToonOption;
+		public poiyomiTemplateOption TargetpoiyomiOption;
+		public UTSTemplateOption TargetUTSOption;
+		public GeneralTemplateOption TargetGeneralOption;
 
 		const string UndoGroupName = "Macchiato MaterialTemplate";
-		int UndoGroupIndex;
+		int UndoGroupIndex = -1;
+		List<Material> ModifiedMaterials = new List<Material>();
 
 		enum ShaderType {
 			Unknown,
@@ -71,7 +38,14 @@ namespace Macchiato.Utility {
 		}
 
 		SerializedObject SerializedMaterialTemplate;
+		SerializedProperty SerializedAvatarGameObject;
+		SerializedProperty SerializedReferenceMaterial;
 		SerializedProperty SerializedTargetMaterials;
+
+		SerializedProperty SerializedlilToonOption;
+		SerializedProperty SerializedpoiyomiOption;
+		SerializedProperty SerializedUTSOption;
+		SerializedProperty SerializedGeneralOption;
 
 		bool FoldlilToon;
 		bool Foldpoiyomi;
@@ -80,21 +54,33 @@ namespace Macchiato.Utility {
 
 		Vector2 ScrollPosition;
 		const float BorderX = 30f;
+		const float ToggleControlWidth = 45f;
+		const float ColorLabelRatio = 0.5f;
 
 		void OnEnable() {
 			SerializedMaterialTemplate = new SerializedObject(this);
-			SerializedTargetMaterials = SerializedMaterialTemplate.FindProperty("TargetMaterials");
+			SerializedAvatarGameObject = SerializedMaterialTemplate.FindProperty(nameof(AvatarGameObject));
+			SerializedReferenceMaterial = SerializedMaterialTemplate.FindProperty(nameof(ReferenceMaterial));
+			SerializedTargetMaterials = SerializedMaterialTemplate.FindProperty(nameof(TargetMaterials));
+			SerializedlilToonOption = SerializedMaterialTemplate.FindProperty(nameof(TargetlilToonOption));
+			SerializedpoiyomiOption = SerializedMaterialTemplate.FindProperty(nameof(TargetpoiyomiOption));
+			SerializedUTSOption = SerializedMaterialTemplate.FindProperty(nameof(TargetUTSOption));
+			SerializedGeneralOption = SerializedMaterialTemplate.FindProperty(nameof(TargetGeneralOption));
 		}
 
 		[MenuItem("Tools/Macchiato/Utility/MaterialTemplate", priority = 1000)]
 		static void CreateWindow() {
-			MaterialTemplate AppWindow = GetWindowWithRect<MaterialTemplate>(new Rect(0, 0, 450, 665), true, "Macchiato MaterialTemplate");
+			MaterialTemplate AppWindow = GetWindowWithRect<MaterialTemplate>(new Rect(0, 0, 450, 685), true, "Macchiato MaterialTemplate");
 			AppWindow.Initialize();
 		}
 
 		void Initialize() {
 			AvatarGameObject = AvatarUtility.GetAvatarGameObject();
 			TargetMaterials = new Material[0];
+			TargetlilToonOption = new lilToonTemplateOption();
+			TargetpoiyomiOption = new poiyomiTemplateOption();
+			TargetUTSOption = new UTSTemplateOption();
+			TargetGeneralOption = new GeneralTemplateOption();
 			FoldlilToon = true;
 			Foldpoiyomi = true;
 			FoldUnityChanToonShader = true;
@@ -115,9 +101,10 @@ namespace Macchiato.Utility {
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			ScrollPosition = EditorGUILayout.BeginScrollView(ScrollPosition, GUILayout.Height(400f));
 			DrawlilToonSection();
+			DrawUTSSection();
 			DrawGeneralSection();
 			EditorGUILayout.EndScrollView();
-			SerializedMaterialTemplate.ApplyModifiedProperties();
+			SerializedMaterialTemplate.ApplyModifiedPropertiesWithoutUndo();
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
@@ -131,35 +118,47 @@ namespace Macchiato.Utility {
 			GUI.backgroundColor = Color.white;
 			GUILayout.Space(BorderX);
 			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal();
+			GUILayout.Space(BorderX);
+			GUI.enabled = IsReadyToRevert();
+			if (GUILayout.Button(GetTranslatedString("String_Undo"))) {
+				RevertMaterialProperties();
+				Repaint();
+			}
+			GUI.enabled = true;
+			GUILayout.Space(BorderX);
+			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
 		}
 
 		void DrawHeaderSection() {
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			EditorGUIUtility.labelWidth = 100f;
+			EditorGUIUtility.labelWidth = 125f;
 			LanguageIndex = EditorGUILayout.Popup(GetTranslatedString("String_Language"), LanguageIndex, LanguageOption);
 			GUILayout.Space(BorderX);
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			AvatarGameObject = (GameObject)EditorGUILayout.ObjectField(GetTranslatedString("String_Avatar"), AvatarGameObject, typeof(GameObject), true);
+			EditorGUILayout.PropertyField(SerializedAvatarGameObject, new GUIContent(GetTranslatedString("String_Avatar")));
 			GUILayout.Space(BorderX);
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			Material NewReferenceMaterial = (Material)EditorGUILayout.ObjectField(GetTranslatedString("String_ReferenceMaterial"), ReferenceMaterial, typeof(Material), true);
-			if (NewReferenceMaterial != ReferenceMaterial) {
-				ReferenceMaterial = NewReferenceMaterial;
+			EditorGUI.BeginChangeCheck();
+			EditorGUILayout.PropertyField(SerializedReferenceMaterial, new GUIContent(GetTranslatedString("String_ReferenceMaterial")));
+			if (EditorGUI.EndChangeCheck()) {
+				SerializedMaterialTemplate.ApplyModifiedPropertiesWithoutUndo();
 				UpdateMaterialColors();
+				SerializedMaterialTemplate.Update();
 			}
 			GUILayout.Space(BorderX);
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			EditorGUILayout.PropertyField(SerializedTargetMaterials, new GUIContent("머테리얼"));
+			EditorGUILayout.PropertyField(SerializedTargetMaterials, new GUIContent(GetTranslatedString("String_Material")));
 			GUILayout.Space(BorderX);
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
@@ -182,12 +181,12 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					UpdatelilToonBasic = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonBasic"), UpdatelilToonBasic);
-					UpdatelilToonLighting = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonLighting"), UpdatelilToonLighting);
-					UpdatelilToonShadow = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonShadow"), UpdatelilToonShadow);
-					UpdatelilToonReceiveShadow = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonReceiveShadow"), UpdatelilToonReceiveShadow);
-					UpdatelilToonBackfaceMask = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonBackfaceMask"), UpdatelilToonBackfaceMask);
-					UpdatelilToonBacklight = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonBacklight"), UpdatelilToonBacklight);
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBasic), "String_UpdatelilToonBasic");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonLighting), "String_UpdatelilToonLighting");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonShadow), "String_UpdatelilToonShadow");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonReceiveShadow), "String_UpdatelilToonReceiveShadow");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBackfaceMask), "String_UpdatelilToonBackfaceMask");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBacklight), "String_UpdatelilToonBacklight");
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -196,11 +195,11 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					ForcelilToonShadow = EditorGUILayout.ToggleLeft(GetTranslatedString("String_ForcelilToonShadow"), ForcelilToonShadow);
-					ForcelilToonRimShade = EditorGUILayout.ToggleLeft(GetTranslatedString("String_ForcelilToonRimShade"), ForcelilToonRimShade);
-					ForcelilToonBacklight = EditorGUILayout.ToggleLeft(GetTranslatedString("String_ForcelilToonBacklight"), ForcelilToonBacklight);
-					ForcelilToonReflection = EditorGUILayout.ToggleLeft(GetTranslatedString("String_ForcelilToonReflection"), ForcelilToonReflection);
-					ForcelilToonRimLight = EditorGUILayout.ToggleLeft(GetTranslatedString("String_ForcelilToonRimLight"), ForcelilToonRimLight);
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonShadow), "String_ForcelilToonShadow");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonRimShade), "String_ForcelilToonRimShade");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonBacklight), "String_ForcelilToonBacklight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonReflection), "String_ForcelilToonReflection");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonRimLight), "String_ForcelilToonRimLight");
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -209,22 +208,45 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					UpdatelilToonShadowColor = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonShadowColor"), UpdatelilToonShadowColor);
-					TargetShadow1Color = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetShadow1Color")), TargetShadow1Color, showEyedropper: true, showAlpha: false, hdr: false);
-					TargetShadow2Color = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetShadow2Color")), TargetShadow2Color, showEyedropper: true, showAlpha: true, hdr: false);
-					TargetShadow3Color = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetShadow3Color")), TargetShadow3Color, showEyedropper: true, showAlpha: true, hdr: false);
-					TargetShadowBorderColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetShadowBorderColor")), TargetShadowBorderColor, showEyedropper: true, showAlpha: true, hdr: false);
-					UpdatelilToonRimShadeColor = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonRimShadeColor"), UpdatelilToonRimShadeColor);
-					TargetRimShadeColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetRimShadeColor")), TargetRimShadeColor, showEyedropper: true, showAlpha: true, hdr: false);
-					UpdatelilToonBacklightColor = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonBacklightColor"), UpdatelilToonBacklightColor);
-					TargetBacklightColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetBacklightColor")), TargetBacklightColor, showEyedropper: true, showAlpha: true, hdr: true);
-					UpdatelilToonReflectionColor = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonReflectionColor"), UpdatelilToonReflectionColor);
-					TargetReflectionColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetReflectionColor")), TargetReflectionColor, showEyedropper: true, showAlpha: true, hdr: true);
-					UpdatelilToonRimLightColor = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonRimLightColor"), UpdatelilToonRimLightColor);
-					TargetRimLightColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetRimLightColor")), TargetRimLightColor, showEyedropper: true, showAlpha: true, hdr: true);
-					UpdatelilToonOutlineColor = EditorGUILayout.ToggleLeft(GetTranslatedString("String_UpdatelilToonOutlineColor"), UpdatelilToonOutlineColor);
-					TargetOutlineColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetOutlineColor")), TargetOutlineColor, showEyedropper: true, showAlpha: true, hdr: true);
-					TargetOutlineHighlightColor = EditorGUILayout.ColorField(new GUIContent(GetTranslatedString("String_TargetOutlineHighlightColor")), TargetOutlineHighlightColor, showEyedropper: true, showAlpha: true, hdr: true);
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonShadowColor), "String_UpdatelilToonShadowColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadow1Color), "String_TargetShadow1Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadow2Color), "String_TargetShadow2Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadow3Color), "String_TargetShadow3Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadowBorderColor), "String_TargetShadowBorderColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonRimShadeColor), "String_UpdatelilToonRimShadeColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetRimShadeColor), "String_TargetRimShadeColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBacklightColor), "String_UpdatelilToonBacklightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetBacklightColor), "String_TargetBacklightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonReflectionColor), "String_UpdatelilToonReflectionColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetReflectionColor), "String_TargetReflectionColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonRimLightColor), "String_UpdatelilToonRimLightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetRimLightColor), "String_TargetRimLightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonOutlineColor), "String_UpdatelilToonOutlineColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetOutlineColor), "String_TargetOutlineColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetOutlineHighlightColor), "String_TargetOutlineHighlightColor");
+				}
+				GUILayout.Space(BorderX);
+				EditorGUILayout.EndHorizontal();
+				EditorGUI.indentLevel--;
+			}
+		}
+
+		void DrawUTSSection() {
+			EditorGUILayout.BeginHorizontal();
+			GUILayout.Space(BorderX);
+			FoldUnityChanToonShader = EditorGUILayout.Foldout(FoldUnityChanToonShader, "UnityChanToonShader");
+			GUILayout.Space(BorderX);
+			EditorGUILayout.EndHorizontal();
+			if (FoldUnityChanToonShader) {
+				EditorGUI.indentLevel++;
+				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(BorderX);
+				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSTextureShared), "String_UpdateUTSTextureShared");
+					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSNormalMap), "String_UpdateUTSNormalMap");
+					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSBasicShading), "String_UpdateUTSBasicShading");
+					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSLightColor), "String_UpdateUTSLightColor");
+					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSEnvironmentalLightingProperties), "String_UpdateUTSEnvironmentalLightingProperties");
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -243,9 +265,9 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					UpdateRenderQueue = EditorGUILayout.ToggleLeft(GetTranslatedString("String_RenderQueue"), UpdateRenderQueue);
-					UpdateGPUInstancing = EditorGUILayout.ToggleLeft(GetTranslatedString("String_GPUInstancing"), UpdateGPUInstancing);
-					UpdateGlobalIllumination = EditorGUILayout.ToggleLeft(GetTranslatedString("String_GlobalIllumination"), UpdateGlobalIllumination);
+					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.UpdateRenderQueue), "String_RenderQueue");
+					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.UpdateGPUInstancing), "String_GPUInstancing");
+					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.UpdateGlobalIllumination), "String_GlobalIllumination");
 				}
 				EditorGUI.indentLevel--;
 				GUILayout.Space(BorderX);
@@ -253,54 +275,61 @@ namespace Macchiato.Utility {
 			}
 		}
 
+		void DrawProperty(SerializedProperty ParentProperty, string TargetPropertyName, string TargetString) {
+			SerializedProperty TargetProperty = ParentProperty.FindPropertyRelative(TargetPropertyName);
+			float OriginalLabelWidth = EditorGUIUtility.labelWidth;
+			EditorGUIUtility.labelWidth = GetLabelWidth(TargetProperty);
+			EditorGUILayout.PropertyField(TargetProperty, new GUIContent(GetTranslatedString(TargetString)));
+			EditorGUIUtility.labelWidth = OriginalLabelWidth;
+		}
+
+		float GetLabelWidth(SerializedProperty TargetProperty) {
+			float ContentWidth = position.width - (BorderX * 2f);
+			if (TargetProperty.propertyType == SerializedPropertyType.Boolean) return ContentWidth - ToggleControlWidth;
+			return ContentWidth * ColorLabelRatio;
+		}
+
 		bool IsReadyToUpdate() {
 			return TargetMaterials.Length > 0;
 		}
 
 		public bool UpdateMaterialProperties() {
-			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
-			bool IsModified = false;
-			lilToonTemplate lilToonTemplateInstance = new lilToonTemplate();
-			poiyomiTemplate poiyomiTemplateInstance = new poiyomiTemplate();
-			UTSTemplate UTSTemplateInstance = new UTSTemplate();
-			GeneralTemplate GeneralTemplateInstance = new GeneralTemplate();
+			int NewUndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
+			List<Material> NewModifiedMaterials = new List<Material>();
+			lilToonTemplate lilToonTemplateInstance = new lilToonTemplate(TargetlilToonOption, ReferenceMaterial);
+			poiyomiTemplate poiyomiTemplateInstance = new poiyomiTemplate(TargetpoiyomiOption, ReferenceMaterial);
+			UTSTemplate UTSTemplateInstance = new UTSTemplate(TargetUTSOption, ReferenceMaterial);
+			GeneralTemplate GeneralTemplateInstance = new GeneralTemplate(TargetGeneralOption, ReferenceMaterial);
 			foreach (Material TargetMaterial in TargetMaterials) {
-				if (TargetMaterial) {
-					Undo.RecordObject(TargetMaterial, UndoGroupName);
-					switch (GetShaderType(TargetMaterial)) {
-						case ShaderType.lilToon:
-							if (lilToonTemplateInstance.UpdatelilToonProperties(TargetMaterial)) {
-								Undo.CollapseUndoOperations(UndoGroupIndex);
-								IsModified = true;
-							}
-							break;
-						case ShaderType.poiyomi:
-							if (poiyomiTemplateInstance.UpdatepoiyomiProperties(TargetMaterial)) {
-								Undo.CollapseUndoOperations(UndoGroupIndex);
-								IsModified = true;
-							}
-							break;
-						case ShaderType.UnityChanToonShader:
-							if (UTSTemplateInstance.UpdateUnityChanToonShaderProperties(TargetMaterial)) {
-								Undo.CollapseUndoOperations(UndoGroupIndex);
-								IsModified = true;
-							}
-							break;
-						default:
-							Debug.LogError($"[Macchiato] {TargetMaterial.shader.name} 쉐이더는 지원하지 않습니다!");
-							break;
-					}
-					if (GeneralTemplateInstance.UpdateGeneralProperties(TargetMaterial)) {
-						Undo.CollapseUndoOperations(UndoGroupIndex);
-						IsModified = true;
-					}
+				if (!TargetMaterial) continue;
+				Undo.RecordObject(TargetMaterial, UndoGroupName);
+				bool IsModified = false;
+				switch (GetShaderType(TargetMaterial)) {
+					case ShaderType.lilToon:
+						IsModified = lilToonTemplateInstance.UpdatelilToonProperties(TargetMaterial);
+						break;
+					case ShaderType.poiyomi:
+						IsModified = poiyomiTemplateInstance.UpdatepoiyomiProperties(TargetMaterial);
+						break;
+					case ShaderType.UnityChanToonShader:
+						IsModified = UTSTemplateInstance.UpdateUnityChanToonShaderProperties(TargetMaterial);
+						break;
+					default:
+						Debug.LogError(string.Format(GetTranslatedString("NOT_SUPPORT_SHADER"), TargetMaterial.shader.name));
+						break;
 				}
+				if (GeneralTemplateInstance.UpdateGeneralProperties(TargetMaterial)) IsModified = true;
+				if (IsModified) NewModifiedMaterials.Add(TargetMaterial);
 			}
-			if (IsModified) {
-				AssetDatabase.SaveAssets();
-				return true;
+			if (NewModifiedMaterials.Count == 0) return false;
+			Undo.FlushUndoRecordObjects();
+			Undo.CollapseUndoOperations(NewUndoGroupIndex);
+			foreach (Material TargetMaterial in NewModifiedMaterials) {
+				AssetDatabase.SaveAssetIfDirty(TargetMaterial);
 			}
-			return false;
+			UndoGroupIndex = NewUndoGroupIndex;
+			ModifiedMaterials = NewModifiedMaterials;
+			return true;
 		}
 
 		void AddAvatarMaterials() {
@@ -316,26 +345,11 @@ namespace Macchiato.Utility {
 			return ShaderType.Unknown;
 		}
 
-		Material[] GetRequestMaterials(ShaderType TargetShaderType) {
-			List<Material> TargetMaterials = new List<Material>();
-			string[] MaterialsGUID = AssetDatabase.FindAssets("glob:\"*.mat\"", new[] { "Assets" });
-			foreach (string TargetMaterialGUID in MaterialsGUID) {
-				Material TargetMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(TargetMaterialGUID));
-				if (TargetMaterial) {
-					if (GetShaderType(TargetMaterial) == TargetShaderType) {
-						TargetMaterials.Add(TargetMaterial);
-					}
-				}
-			}
-			return TargetMaterials.Distinct().OrderBy(Item => Item.name).ToArray();
-		}
-
 		void UpdateMaterialColors() {
 			if (ReferenceMaterial) {
 				switch (GetShaderType(ReferenceMaterial)) {
 					case ShaderType.lilToon:
-						lilToonTemplate lilToonTemplateInstance = new lilToonTemplate();
-						lilToonTemplateInstance.GetlilToonColors(ReferenceMaterial);
+						TargetlilToonOption.GetlilToonColors(ReferenceMaterial);
 						break;
 					case ShaderType.poiyomi:
 						break;
@@ -343,6 +357,23 @@ namespace Macchiato.Utility {
 						break;
 				}
 			}
+		}
+
+		bool IsReadyToRevert() {
+			return UndoGroupIndex >= 0 && ModifiedMaterials.Count > 0;
+		}
+
+		public bool RevertMaterialProperties() {
+			if (!IsReadyToRevert()) return false;
+			Undo.RevertAllDownToGroup(UndoGroupIndex);
+			foreach (Material TargetMaterial in ModifiedMaterials) {
+				if (!TargetMaterial) continue;
+				EditorUtility.SetDirty(TargetMaterial);
+				AssetDatabase.SaveAssetIfDirty(TargetMaterial);
+			}
+			UndoGroupIndex = -1;
+			ModifiedMaterials.Clear();
+			return true;
 		}
 	}
 }
