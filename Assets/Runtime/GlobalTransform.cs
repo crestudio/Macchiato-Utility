@@ -12,7 +12,6 @@ namespace Macchiato.Utility {
 
 	[AddComponentMenu("Caramel Macchiato/Macchiato GlobalTransform")]
 	[HelpURL("https://macchiato.booth.pm/")]
-	[RequireComponent(typeof(Transform))]
 	public class GlobalTransform : MonoBehaviour, IEditorOnly { }
 }
 #endif
