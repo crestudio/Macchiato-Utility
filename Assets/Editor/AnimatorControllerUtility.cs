@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
@@ -13,16 +11,16 @@ using Macchiato.Core;
 
 namespace Macchiato.Utility {
 
-	public class AnimatorControllerController : EditorWindow {
+	public class AnimatorControllerUtility : EditorWindow {
 
 		[MenuItem("Assets/Macchiato/Animator/Write Defaults On", true)]
 		static bool ValidateControllerOn() {
-			return IsAnimatorController(Selection.objects);
+			return AssetUtility.ContainAnimatorController(Selection.objects);
 		}
 
 		[MenuItem("Assets/Macchiato/Animator/Write Defaults Off", true)]
 		static bool ValidateControllerOff() {
-			return IsAnimatorController(Selection.objects);
+			return AssetUtility.ContainAnimatorController(Selection.objects);
 		}
 
 		[MenuItem("Assets/Macchiato/Animator/Write Defaults On", priority = 1000)]
@@ -32,7 +30,7 @@ namespace Macchiato.Utility {
 				try {
 					for (int Index = 0; Index < Selection.objects.Length; Index++) {
 						if (!Selection.objects[Index]) continue;
-						EditorUtility.DisplayProgressBar("Cleaning Broken YAML Formatting",
+						EditorUtility.DisplayProgressBar("Write Defaults On",
 							$"Processing : {Selection.objects[Index].name}",
 							(float)Index / Selection.objects.Length);
 						if (Selection.objects[Index] is not AnimatorController) continue;
@@ -44,7 +42,10 @@ namespace Macchiato.Utility {
 					}
 				} finally {
 					EditorUtility.ClearProgressBar();
-					AssetDatabase.Refresh();
+					if (ModifiedCount > 0) {
+						AssetDatabase.SaveAssets();
+						AssetDatabase.Refresh();
+					}
 				}
 				Debug.Log($"[Macchiato] Modified write defaults on in {ModifiedCount} animator controllers");
 			}
@@ -57,7 +58,7 @@ namespace Macchiato.Utility {
 				try {
 					for (int Index = 0; Index < Selection.objects.Length; Index++) {
 						if (!Selection.objects[Index]) continue;
-						EditorUtility.DisplayProgressBar("Cleaning Broken YAML Formatting",
+						EditorUtility.DisplayProgressBar("Write Defaults Off",
 							$"Processing : {Selection.objects[Index].name}",
 							(float)Index / Selection.objects.Length);
 						if (Selection.objects[Index] is not AnimatorController) continue;
@@ -69,7 +70,10 @@ namespace Macchiato.Utility {
 					}
 				} finally {
 					EditorUtility.ClearProgressBar();
-					AssetDatabase.Refresh();
+					if (ModifiedCount > 0) {
+						AssetDatabase.SaveAssets();
+						AssetDatabase.Refresh();
+					}
 				}
 				Debug.Log($"[Macchiato] Modified write defaults off in {ModifiedCount} animator controllers");
 			}
@@ -81,17 +85,11 @@ namespace Macchiato.Utility {
 			foreach (AnimatorState TargetState in AllAnimatorStates) {
 				if (TargetState.writeDefaultValues != TargetWriteDefaults) {
 					TargetState.writeDefaultValues = TargetWriteDefaults;
+					EditorUtility.SetDirty(TargetState);
 					IsModified = true;
 				}
 			}
 			return IsModified;
-		}
-
-		static bool IsAnimatorController(Object[] TargetObjects) {
-			return TargetObjects
-				.Select(Item => AssetDatabase.GetAssetPath(Item))
-				.Select(Item => Item.EndsWith(".controller"))
-				.Contains(true);
 		}
 	}
 }
