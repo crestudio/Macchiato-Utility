@@ -346,9 +346,7 @@ namespace Macchiato.Utility {
 			if (NewModifiedMaterials.Count == 0) return false;
 			Undo.FlushUndoRecordObjects();
 			Undo.CollapseUndoOperations(NewUndoGroupIndex);
-			foreach (Material TargetMaterial in NewModifiedMaterials) {
-				AssetDatabase.SaveAssetIfDirty(TargetMaterial);
-			}
+			AssetDatabase.SaveAssets();
 			UndoGroupIndex = NewUndoGroupIndex;
 			ModifiedMaterials = NewModifiedMaterials;
 			return true;
@@ -387,8 +385,8 @@ namespace Macchiato.Utility {
 			foreach (Material TargetMaterial in ModifiedMaterials) {
 				if (!TargetMaterial) continue;
 				EditorUtility.SetDirty(TargetMaterial);
-				AssetDatabase.SaveAssetIfDirty(TargetMaterial);
 			}
+			AssetDatabase.SaveAssets();
 			UndoGroupIndex = -1;
 			ModifiedMaterials.Clear();
 			return true;
