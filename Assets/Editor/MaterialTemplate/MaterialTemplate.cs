@@ -354,6 +354,7 @@ namespace Macchiato.Utility {
 
 		void AddAvatarMaterials() {
 			Material[] AvatarMaterials = AvatarUtility.GetAvatarMaterials(AvatarGameObject);
+			if (AvatarMaterials == null) return;
 			TargetMaterials = TargetMaterials.Concat(AvatarMaterials).Distinct().ToArray();
 		}
 

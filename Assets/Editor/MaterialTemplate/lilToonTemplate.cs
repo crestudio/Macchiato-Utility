@@ -128,40 +128,45 @@ namespace Macchiato.Utility {
 		internal bool UpdatelilToonProperties(Material TargetMaterial) {
 			bool IsModified = false;
 			if (TargetTemplateOption.UpdatelilToonBasic) {
-				if (UpdateFloatProperties(TargetMaterial, BasicFloatProperties)) IsModified = true;
+				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, BasicFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonLighting) {
-				if (UpdatelilToonLightingProperties(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, LightingFloatProperties)) IsModified = true;
+				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, LightingColorProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonShadow) {
-				if (UpdateFloatProperties(TargetMaterial, ShadowFloatProperties)) IsModified = true;
+				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, ShadowFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonReceiveShadow) {
-				if (UpdateFloatProperties(TargetMaterial, ReceiveShadowFloatProperties)) IsModified = true;
+				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, ReceiveShadowFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonBackfaceMask) {
-				if (UpdateFloatProperties(TargetMaterial, BackfaceMaskFloatProperties)) IsModified = true;
+				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, BackfaceMaskFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonBacklight) {
-				if (UpdateFloatProperties(TargetMaterial, BacklightFloatProperties)) IsModified = true;
+				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, BacklightFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonShadowColor) {
-				if (UpdatelilToonShadowColors(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_ShadowColor", TargetTemplateOption.TargetShadow1Color)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_Shadow2ndColor", TargetTemplateOption.TargetShadow2Color)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_Shadow3rdColor", TargetTemplateOption.TargetShadow3Color)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_ShadowBorderColor", TargetTemplateOption.TargetShadowBorderColor)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonRimShadeColor) {
-				if (UpdatelilToonRimShadeColors(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_RimShadeColor", TargetTemplateOption.TargetRimShadeColor)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonBacklightColor) {
-				if (UpdatelilToonBacklightColors(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_BacklightColor", TargetTemplateOption.TargetBacklightColor)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonReflectionColor) {
-				if (UpdatelilToonReflectionColors(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_ReflectionColor", TargetTemplateOption.TargetReflectionColor)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonRimLightColor) {
-				if (UpdatelilToonRimLightColors(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_RimColor", TargetTemplateOption.TargetRimLightColor)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdatelilToonOutlineColor) {
-				if (UpdatelilToonOutlineColors(TargetMaterial)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_OutlineColor", TargetTemplateOption.TargetOutlineColor)) IsModified = true;
+				if (MaterialUtility.SetColorProperty(TargetMaterial, "_OutlineLitColor", TargetTemplateOption.TargetOutlineHighlightColor)) IsModified = true;
 			}
 			if (ForcelilToonProperties(TargetMaterial)) IsModified = true;
 			if (IsModified) {
@@ -171,113 +176,23 @@ namespace Macchiato.Utility {
 			return false;
 		}
 
-		bool UpdateFloatProperties(Material TargetMaterial, (string PropertyName, float DefaultValue)[] TargetProperties) {
-			bool IsDirty = false;
-			foreach ((string PropertyName, float DefaultValue) TargetProperty in TargetProperties) {
-				bool HasReferenceValue = ReferenceMaterial && ReferenceMaterial.HasProperty(TargetProperty.PropertyName);
-				float NewValue = HasReferenceValue ? ReferenceMaterial.GetFloat(TargetProperty.PropertyName) : TargetProperty.DefaultValue;
-				if (MaterialUtility.SetFloatProperty(TargetMaterial, TargetProperty.PropertyName, NewValue)) IsDirty = true;
-			}
-			return IsDirty;
-		}
-
-		bool UpdatelilToonLightingProperties(Material TargetMaterial) {
-			bool IsDirty = false;
-			foreach ((string PropertyName, float DefaultValue) TargetProperty in LightingFloatProperties) {
-				bool HasReferenceValue = ReferenceMaterial && ReferenceMaterial.HasProperty(TargetProperty.PropertyName);
-				float NewValue = HasReferenceValue ? ReferenceMaterial.GetFloat(TargetProperty.PropertyName) : TargetProperty.DefaultValue;
-				if (MaterialUtility.SetFloatProperty(TargetMaterial, TargetProperty.PropertyName, NewValue)) IsDirty = true;
-			}
-			foreach ((string PropertyName, Color DefaultValue) TargetProperty in LightingColorProperties) {
-				bool HasReferenceValue = ReferenceMaterial && ReferenceMaterial.HasProperty(TargetProperty.PropertyName);
-				Color NewValue = HasReferenceValue ? ReferenceMaterial.GetColor(TargetProperty.PropertyName) : TargetProperty.DefaultValue;
-				if (MaterialUtility.SetColorProperty(TargetMaterial, TargetProperty.PropertyName, NewValue)) IsDirty = true;
-			}
-			return IsDirty;
-		}
-
 		bool ForcelilToonProperties(Material TargetMaterial) {
 			bool IsDirty = false;
 			if (TargetTemplateOption.ForcelilToonShadow) {
-				if (TargetMaterial.GetFloat("_UseShadow") != 1.0f) {
-					TargetMaterial.SetFloat("_UseShadow", 1.0f);
-					IsDirty = true;
-				}
+				if (MaterialUtility.SetFloatProperty(TargetMaterial, "_UseShadow", 1.0f)) IsDirty = true;
 			}
 			if (TargetTemplateOption.ForcelilToonRimShade) {
-				if (TargetMaterial.GetFloat("_UseRimShade") != 1.0f) {
-					TargetMaterial.SetFloat("_UseRimShade", 1.0f);
-					IsDirty = true;
-				}
+				if (MaterialUtility.SetFloatProperty(TargetMaterial, "_UseRimShade", 1.0f)) IsDirty = true;
 			}
 			if (TargetTemplateOption.ForcelilToonBacklight) {
-				if (TargetMaterial.GetFloat("_UseBacklight") != 1.0f) {
-					TargetMaterial.SetFloat("_UseBacklight", 1.0f);
-					IsDirty = true;
-				}
+				if (MaterialUtility.SetFloatProperty(TargetMaterial, "_UseBacklight", 1.0f)) IsDirty = true;
 			}
 			if (TargetTemplateOption.ForcelilToonReflection) {
-				if (TargetMaterial.GetFloat("_UseReflection") != 1.0f) {
-					TargetMaterial.SetFloat("_UseReflection", 1.0f);
-					IsDirty = true;
-				}
+				if (MaterialUtility.SetFloatProperty(TargetMaterial, "_UseReflection", 1.0f)) IsDirty = true;
 			}
 			if (TargetTemplateOption.ForcelilToonRimLight) {
-				if (TargetMaterial.GetFloat("_UseRim") != 1.0f) {
-					TargetMaterial.SetFloat("_UseRim", 1.0f);
-					IsDirty = true;
-				}
+				if (MaterialUtility.SetFloatProperty(TargetMaterial, "_UseRim", 1.0f)) IsDirty = true;
 			}
-			return IsDirty;
-		}
-
-		bool UpdatelilToonShadowColors(Material TargetMaterial) {
-			bool IsDirty = false;
-			Color ShadowColor = TargetTemplateOption.TargetShadow1Color;
-			Color Shadow2ndColor = TargetTemplateOption.TargetShadow2Color;
-			Color Shadow3rdColor = TargetTemplateOption.TargetShadow3Color;
-			Color ShadowBorderColor = TargetTemplateOption.TargetShadowBorderColor;
-			if (TargetMaterial.GetColor("_ShadowColor") != ShadowColor) { TargetMaterial.SetColor("_ShadowColor", ShadowColor); IsDirty = true; }
-			if (TargetMaterial.GetColor("_Shadow2ndColor") != Shadow2ndColor) { TargetMaterial.SetColor("_Shadow2ndColor", Shadow2ndColor); IsDirty = true; }
-			if (TargetMaterial.GetColor("_Shadow3rdColor") != Shadow3rdColor) { TargetMaterial.SetColor("_Shadow3rdColor", Shadow3rdColor); IsDirty = true; }
-			if (TargetMaterial.GetColor("_ShadowBorderColor") != ShadowBorderColor) { TargetMaterial.SetColor("_ShadowBorderColor", ShadowBorderColor); IsDirty = true; }
-			return IsDirty;
-		}
-
-		bool UpdatelilToonRimShadeColors(Material TargetMaterial) {
-			bool IsDirty = false;
-			Color RimShadeColor = TargetTemplateOption.TargetRimShadeColor;
-			if (TargetMaterial.GetColor("_RimShadeColor") != RimShadeColor) { TargetMaterial.SetColor("_RimShadeColor", RimShadeColor); IsDirty = true; }
-			return IsDirty;
-		}
-
-		bool UpdatelilToonBacklightColors(Material TargetMaterial) {
-			bool IsDirty = false;
-			Color BacklightColor = TargetTemplateOption.TargetBacklightColor;
-			if (TargetMaterial.GetColor("_BacklightColor") != BacklightColor) { TargetMaterial.SetColor("_BacklightColor", BacklightColor); IsDirty = true; }
-			return IsDirty;
-		}
-
-		bool UpdatelilToonReflectionColors(Material TargetMaterial) {
-			bool IsDirty = false;
-			Color ReflectionColor = TargetTemplateOption.TargetReflectionColor;
-			if (TargetMaterial.GetColor("_ReflectionColor") != ReflectionColor) { TargetMaterial.SetColor("_ReflectionColor", ReflectionColor); IsDirty = true; }
-			return IsDirty;
-		}
-
-		bool UpdatelilToonRimLightColors(Material TargetMaterial) {
-			bool IsDirty = false;
-			Color RimColor = TargetTemplateOption.TargetRimLightColor;
-			if (TargetMaterial.GetColor("_RimColor") != RimColor) { TargetMaterial.SetColor("_RimColor", RimColor); IsDirty = true; }
-			return IsDirty;
-		}
-
-		bool UpdatelilToonOutlineColors(Material TargetMaterial) {
-			bool IsDirty = false;
-			Color OutlineColor = TargetTemplateOption.TargetOutlineColor;
-			Color OutlineLitColor = TargetTemplateOption.TargetOutlineHighlightColor;
-			if (TargetMaterial.GetColor("_OutlineColor") != OutlineColor) { TargetMaterial.SetColor("_OutlineColor", OutlineColor); IsDirty = true; }
-			if (TargetMaterial.GetColor("_OutlineLitColor") != OutlineLitColor) { TargetMaterial.SetColor("_OutlineLitColor", OutlineLitColor); IsDirty = true; }
 			return IsDirty;
 		}
 	}
