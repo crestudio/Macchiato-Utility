@@ -694,54 +694,54 @@ namespace Macchiato.Utility {
 			if (TargetTemplateOption.UpdateAlpha) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, AlphaFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateShadow) {
+			if (TargetTemplateOption.UpdateShadow && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseShadow")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, ShadowFloatProperties)) IsModified = true;
 				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, ShadowColorProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateRimShade) {
+			if (TargetTemplateOption.UpdateRimShade && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseRimShade")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, RimShadeFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateEmission1) {
+			if (TargetTemplateOption.UpdateEmission1 && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseEmission")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, Emission1FloatProperties)) IsModified = true;
 				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, Emission1ColorProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateEmission2) {
+			if (TargetTemplateOption.UpdateEmission2 && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseEmission2nd")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, Emission2FloatProperties)) IsModified = true;
 				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, Emission2ColorProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateAnisotropy) {
+			if (TargetTemplateOption.UpdateAnisotropy && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseAnisotropy")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, AnisotropyFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateBacklight) {
+			if (TargetTemplateOption.UpdateBacklight && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseBacklight")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, BacklightFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateReflection) {
+			if (TargetTemplateOption.UpdateReflection && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseReflection")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, ReflectionFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateMatCap1) {
+			if (TargetTemplateOption.UpdateMatCap1 && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseMatCap")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, MatCap1FloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateMatCap2) {
+			if (TargetTemplateOption.UpdateMatCap2 && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseMatCap2nd")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, MatCap2FloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateRimLight) {
+			if (TargetTemplateOption.UpdateRimLight && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseRim")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, RimLightFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateGlitter) {
+			if (TargetTemplateOption.UpdateGlitter && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseGlitter")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, GlitterFloatProperties)) IsModified = true;
 				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, GlitterColorProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateOutline) {
+			if (TargetTemplateOption.UpdateOutline && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseOutline")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, OutlineFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateParallax) {
+			if (TargetTemplateOption.UpdateParallax && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseParallax")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, ParallaxFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdateDistanceFade) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, DistanceFadeFloatProperties)) IsModified = true;
 				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, DistanceFadeColorProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateAudioLink) {
+			if (TargetTemplateOption.UpdateAudioLink && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseAudioLink")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, AudioLinkFloatProperties)) IsModified = true;
 				if (MaterialUtility.UpdateColorProperties(TargetMaterial, ReferenceMaterial, AudioLinkColorProperties)) IsModified = true;
 			}
@@ -752,7 +752,7 @@ namespace Macchiato.Utility {
 			if (TargetTemplateOption.UpdateIDMask) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, IDMaskFloatProperties)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateUVTileDiscard) {
+			if (TargetTemplateOption.UpdateUVTileDiscard && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UDIMDiscardCompile")) {
 				if (MaterialUtility.UpdateFloatProperties(TargetMaterial, ReferenceMaterial, UVTileDiscardFloatProperties)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdateStencil) {
