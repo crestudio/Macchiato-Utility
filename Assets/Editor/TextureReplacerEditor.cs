@@ -95,11 +95,13 @@ namespace Macchiato.Utility {
 			}
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			serializedObject.ApplyModifiedProperties();
-			if (GUILayout.Button(GetTranslatedString("String_Replace"))) {
+			GUI.backgroundColor = Color.cyan;
+			if (GUILayout.Button(GetTranslatedString("String_Replace"), GUILayout.Height(40f))) {
 				(target as TextureReplacer).RequestUpdateAvatarMaterials();
 				(target as TextureReplacer).RequestGetAvatarMaterials();
 				Repaint();
 			}
+			GUI.backgroundColor = Color.white;
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button(GetTranslatedString("String_Undo"))) {
 				Undo.PerformUndo();
