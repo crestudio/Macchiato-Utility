@@ -101,7 +101,6 @@ namespace Macchiato.Utility {
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			ScrollPosition = EditorGUILayout.BeginScrollView(ScrollPosition, GUILayout.Height(400f));
 			DrawlilToonSection();
-			DrawUTSSection();
 			DrawGeneralSection();
 			EditorGUILayout.EndScrollView();
 			SerializedMaterialTemplate.ApplyModifiedPropertiesWithoutUndo();
@@ -231,6 +230,25 @@ namespace Macchiato.Utility {
 			}
 		}
 
+		void DrawpoiyomiSection() {
+			EditorGUILayout.BeginHorizontal();
+			GUILayout.Space(BorderX);
+			Foldpoiyomi = EditorGUILayout.Foldout(Foldpoiyomi, "poiyomi");
+			GUILayout.Space(BorderX);
+			EditorGUILayout.EndHorizontal();
+			if (Foldpoiyomi) {
+				EditorGUI.indentLevel++;
+				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(BorderX);
+				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+
+				}
+				GUILayout.Space(BorderX);
+				EditorGUILayout.EndHorizontal();
+				EditorGUI.indentLevel--;
+			}
+		}
+
 		void DrawUTSSection() {
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
@@ -291,6 +309,10 @@ namespace Macchiato.Utility {
 
 		bool IsReadyToUpdate() {
 			return TargetMaterials.Length > 0;
+		}
+
+		bool IsReadyToRevert() {
+			return UndoGroupIndex >= 0 && ModifiedMaterials.Count > 0;
 		}
 
 		public bool UpdateMaterialProperties() {
@@ -357,10 +379,6 @@ namespace Macchiato.Utility {
 						break;
 				}
 			}
-		}
-
-		bool IsReadyToRevert() {
-			return UndoGroupIndex >= 0 && ModifiedMaterials.Count > 0;
 		}
 
 		public bool RevertMaterialProperties() {
