@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using UnityEditor;
 using UnityEngine;
 
 using Macchiato.Core;
+using static Macchiato.Core.MaterialUtility;
 using static Macchiato.Core.Translator;
 
 /*
@@ -29,13 +29,6 @@ namespace Macchiato.Utility {
 		const string UndoGroupName = "Macchiato MaterialTemplate";
 		int UndoGroupIndex = -1;
 		List<Material> ModifiedMaterials = new List<Material>();
-
-		enum ShaderType {
-			Unknown,
-			lilToon,
-			poiyomi,
-			UnityChanToonShader
-		}
 
 		SerializedObject SerializedMaterialTemplate;
 		SerializedProperty SerializedAvatarGameObject;
@@ -428,14 +421,6 @@ namespace Macchiato.Utility {
 			Material[] AvatarMaterials = AvatarUtility.GetAvatarMaterials(AvatarGameObject);
 			if (AvatarMaterials == null) return;
 			TargetMaterials = TargetMaterials.Concat(AvatarMaterials).Distinct().ToArray();
-		}
-
-		ShaderType GetShaderType(Material TargetMaterial) {
-			string TargetShaderName = TargetMaterial.shader.name;
-			if (TargetShaderName.Contains("lilToon", StringComparison.OrdinalIgnoreCase)) return ShaderType.lilToon;
-			if (TargetShaderName.Contains("poiyomi", StringComparison.OrdinalIgnoreCase)) return ShaderType.poiyomi;
-			if (TargetShaderName.Contains("UnityChanToonShader", StringComparison.OrdinalIgnoreCase)) return ShaderType.UnityChanToonShader;
-			return ShaderType.Unknown;
 		}
 
 		void UpdateMaterialColors() {
