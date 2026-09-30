@@ -100,6 +100,7 @@ namespace Macchiato.Utility {
 			DrawHeaderSection();
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			ScrollPosition = EditorGUILayout.BeginScrollView(ScrollPosition, GUILayout.Height(400f));
+			DrawButtonSection();
 			DrawlilToonSection();
 			DrawGeneralSection();
 			EditorGUILayout.EndScrollView();
@@ -169,6 +170,33 @@ namespace Macchiato.Utility {
 			EditorGUILayout.EndHorizontal();
 		}
 
+		void DrawButtonSection() {
+			EditorGUILayout.BeginHorizontal();
+			GUILayout.Space(BorderX);
+			if (GUILayout.Button(GetTranslatedString("String_Common"), EditorStyles.miniButtonLeft)) {
+				TargetlilToonOption.SelectCommon();
+				TargetGeneralOption.SelectCommon();
+				SerializedMaterialTemplate.Update();
+			}
+			if (GUILayout.Button(GetTranslatedString("String_Macchiato"), EditorStyles.miniButtonMid)) {
+				TargetlilToonOption.SelectMacchiato();
+				TargetGeneralOption.SelectMacchiato();
+				SerializedMaterialTemplate.Update();
+			}
+			if (GUILayout.Button(GetTranslatedString("String_DeepCopy"), EditorStyles.miniButtonMid)) {
+				TargetlilToonOption.SelectDeepCopy();
+				TargetGeneralOption.SelectDeepCopy();
+				SerializedMaterialTemplate.Update();
+			}
+			if (GUILayout.Button(GetTranslatedString("String_None"), EditorStyles.miniButtonRight)) {
+				TargetlilToonOption.SelectNone();
+				TargetGeneralOption.SelectNone();
+				SerializedMaterialTemplate.Update();
+			}
+			GUILayout.Space(BorderX);
+			EditorGUILayout.EndHorizontal();
+		}
+
 		void DrawlilToonSection() {
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
@@ -180,12 +208,30 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBasic), "String_UpdatelilToonBasic");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonLighting), "String_UpdatelilToonLighting");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonShadow), "String_UpdatelilToonShadow");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonReceiveShadow), "String_UpdatelilToonReceiveShadow");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBackfaceMask), "String_UpdatelilToonBackfaceMask");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBacklight), "String_UpdatelilToonBacklight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateBasic), "String_UpdatelilToonBasic");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateLighting), "String_UpdatelilToonLighting");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateAlpha), "String_UpdatelilToonAlpha");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateShadow), "String_UpdatelilToonShadow");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateRimShade), "String_UpdatelilToonRimShade");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateEmission1), "String_UpdatelilToonEmission1");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateEmission2), "String_UpdatelilToonEmission2");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateAnisotropy), "String_UpdatelilToonAnisotropy");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateBacklight), "String_UpdatelilToonBacklight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateReflection), "String_UpdatelilToonReflection");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateMatCap1), "String_UpdatelilToonMatCap1");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateMatCap2), "String_UpdatelilToonMatCap2");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateRimLight), "String_UpdatelilToonRimLight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateGlitter), "String_UpdatelilToonGlitter");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateOutline), "String_UpdatelilToonOutline");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateParallax), "String_UpdatelilToonParallax");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateDistanceFade), "String_UpdatelilToonDistanceFade");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateAudioLink), "String_UpdatelilToonAudioLink");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateDissolve), "String_UpdatelilToonDissolve");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateIDMask), "String_UpdatelilToonIDMask");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateUVTileDiscard), "String_UpdatelilToonUVTileDiscard");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateStencil), "String_UpdatelilToonStencil");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateRendering), "String_UpdatelilToonRendering");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateTessellation), "String_UpdatelilToonTessellation");
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -194,11 +240,20 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonShadow), "String_ForcelilToonShadow");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonRimShade), "String_ForcelilToonRimShade");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonBacklight), "String_ForcelilToonBacklight");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonReflection), "String_ForcelilToonReflection");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForcelilToonRimLight), "String_ForcelilToonRimLight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceShadow), "String_ForcelilToonShadow");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceRimShade), "String_ForcelilToonRimShade");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceEmission1), "String_ForcelilToonEmission1");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceEmission2), "String_ForcelilToonEmission2");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceAnisotropy), "String_ForcelilToonAnisotropy");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceBacklight), "String_ForcelilToonBacklight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceReflection), "String_ForcelilToonReflection");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceMatCap1), "String_ForcelilToonMatCap1");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceMatCap2), "String_ForcelilToonMatCap2");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceRimLight), "String_ForcelilToonRimLight");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceGlitter), "String_ForcelilToonGlitter");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceParallax), "String_ForcelilToonParallax");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceAudioLink), "String_ForcelilToonAudioLink");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ForceUVTileDiscard), "String_ForcelilToonUVTileDiscard");
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -207,22 +262,37 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonShadowColor), "String_UpdatelilToonShadowColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadow1Color), "String_TargetShadow1Color");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadow2Color), "String_TargetShadow2Color");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadow3Color), "String_TargetShadow3Color");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetShadowBorderColor), "String_TargetShadowBorderColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonRimShadeColor), "String_UpdatelilToonRimShadeColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetRimShadeColor), "String_TargetRimShadeColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonBacklightColor), "String_UpdatelilToonBacklightColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetBacklightColor), "String_TargetBacklightColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonReflectionColor), "String_UpdatelilToonReflectionColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetReflectionColor), "String_TargetReflectionColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonRimLightColor), "String_UpdatelilToonRimLightColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetRimLightColor), "String_TargetRimLightColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdatelilToonOutlineColor), "String_UpdatelilToonOutlineColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetOutlineColor), "String_TargetOutlineColor");
-					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.TargetOutlineHighlightColor), "String_TargetOutlineHighlightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateBackfaceColor), "String_UpdatelilToonBackfaceColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.BackfaceColor), "String_TargetBackfaceColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateShadowColor), "String_UpdatelilToonShadowColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.Shadow1Color), "String_TargetShadow1Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.Shadow2Color), "String_TargetShadow2Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.Shadow3Color), "String_TargetShadow3Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ShadowBorderColor), "String_TargetShadowBorderColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateRimShadeColor), "String_UpdatelilToonRimShadeColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.RimShadeColor), "String_TargetRimShadeColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateEmission1Color), "String_UpdatelilToonEmission1Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.Emission1Color), "String_TargetEmission1Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateEmission2Color), "String_UpdatelilToonEmission2Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.Emission2Color), "String_TargetEmission2Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateBacklightColor), "String_UpdatelilToonBacklightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.BacklightColor), "String_TargetBacklightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateReflectionColor), "String_UpdatelilToonReflectionColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.ReflectionColor), "String_TargetReflectionColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateMatCap1Color), "String_UpdatelilToonMatCap1Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.MatCap1Color), "String_TargetMatCap1Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateMatCap2Color), "String_UpdatelilToonMatCap2Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.MatCap2Color), "String_TargetMatCap2Color");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateRimLightColor), "String_UpdatelilToonRimLightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.RimLightColor), "String_TargetRimLightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateGlitterColor), "String_UpdatelilToonGlitterColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.GlitterColor), "String_TargetGlitterColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateOutlineColor), "String_UpdatelilToonOutlineColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.OutlineColor), "String_TargetOutlineColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.OutlineHighlightColor), "String_TargetOutlineHighlightColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.UpdateDistanceFadeColor), "String_UpdatelilToonDistanceFadeColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.DistanceFadeColor), "String_TargetDistanceFadeColor");
+					DrawProperty(SerializedlilToonOption, nameof(TargetlilToonOption.DistanceFadeRimColor), "String_TargetDistanceFadeRimColor");
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -260,11 +330,7 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSTextureShared), "String_UpdateUTSTextureShared");
-					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSNormalMap), "String_UpdateUTSNormalMap");
-					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSBasicShading), "String_UpdateUTSBasicShading");
-					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSLightColor), "String_UpdateUTSLightColor");
-					DrawProperty(SerializedUTSOption, nameof(TargetUTSOption.UpdateUTSEnvironmentalLightingProperties), "String_UpdateUTSEnvironmentalLightingProperties");
+
 				}
 				GUILayout.Space(BorderX);
 				EditorGUILayout.EndHorizontal();
@@ -283,7 +349,7 @@ namespace Macchiato.Utility {
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.UpdateRenderQueue), "String_RenderQueue");
+					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.ResetRenderQueue), "String_RenderQueue");
 					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.UpdateGPUInstancing), "String_GPUInstancing");
 					DrawProperty(SerializedGeneralOption, nameof(TargetGeneralOption.UpdateGlobalIllumination), "String_GlobalIllumination");
 				}
@@ -328,7 +394,7 @@ namespace Macchiato.Utility {
 				bool IsModified = false;
 				switch (GetShaderType(TargetMaterial)) {
 					case ShaderType.lilToon:
-						IsModified = lilToonTemplateInstance.UpdatelilToonProperties(TargetMaterial);
+						IsModified = lilToonTemplateInstance.UpdateProperties(TargetMaterial);
 						break;
 					case ShaderType.poiyomi:
 						IsModified = poiyomiTemplateInstance.UpdatepoiyomiProperties(TargetMaterial);
@@ -337,12 +403,13 @@ namespace Macchiato.Utility {
 						IsModified = UTSTemplateInstance.UpdateUnityChanToonShaderProperties(TargetMaterial);
 						break;
 					default:
-						Debug.LogError(string.Format(GetTranslatedString("NOT_SUPPORT_SHADER"), TargetMaterial.shader.name));
+						Debug.LogError($"[Macchiato] {string.Format(GetTranslatedString("NOT_SUPPORT_SHADER"), TargetMaterial.shader.name)}");
 						break;
 				}
 				if (GeneralTemplateInstance.UpdateGeneralProperties(TargetMaterial)) IsModified = true;
 				if (IsModified) NewModifiedMaterials.Add(TargetMaterial);
 			}
+			Debug.Log($"[Macchiato] {string.Format(GetTranslatedString("COMPLETED_UPDATEMATERIAL"), NewModifiedMaterials.Count)}");
 			if (NewModifiedMaterials.Count == 0) return false;
 			Undo.FlushUndoRecordObjects();
 			Undo.CollapseUndoOperations(NewUndoGroupIndex);

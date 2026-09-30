@@ -13,9 +13,33 @@ namespace Macchiato.Utility {
 	[Serializable]
 	public class GeneralTemplateOption {
 
-		public bool UpdateRenderQueue = false;
+		public bool ResetRenderQueue = false;
 		public bool UpdateGPUInstancing = false;
 		public bool UpdateGlobalIllumination = false;
+
+		internal void SelectCommon() {
+			ResetRenderQueue = false;
+			UpdateGPUInstancing = true;
+			UpdateGlobalIllumination = true;
+		}
+
+		internal void SelectMacchiato() {
+			ResetRenderQueue = false;
+			UpdateGPUInstancing = true;
+			UpdateGlobalIllumination = true;
+		}
+
+		internal void SelectDeepCopy() {
+			ResetRenderQueue = true;
+			UpdateGPUInstancing = true;
+			UpdateGlobalIllumination = true;
+		}
+
+		internal void SelectNone() {
+			ResetRenderQueue = false;
+			UpdateGPUInstancing = false;
+			UpdateGlobalIllumination = false;
+		}
 	}
 
 	internal class GeneralTemplate {
@@ -30,14 +54,14 @@ namespace Macchiato.Utility {
 
 		internal bool UpdateGeneralProperties(Material TargetMaterial) {
 			bool IsModified = false;
-			if (TargetTemplateOption.UpdateRenderQueue) {
-				if (UpdateRenderQueueProperties(TargetMaterial)) IsModified = true;
+			if (TargetTemplateOption.ResetRenderQueue) {
+				if (ResetRenderQueueProperties(TargetMaterial)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdateGPUInstancing) {
-				if (UpdateGPUInstancingProperties(TargetMaterial)) IsModified = true;
+				if (UpdateGPUInstancingProperties(TargetMaterial, ReferenceMaterial)) IsModified = true;
 			}
 			if (TargetTemplateOption.UpdateGlobalIllumination) {
-				if (UpdateGlobalIlluminationProperties(TargetMaterial)) IsModified = true;
+				if (UpdateGlobalIlluminationProperties(TargetMaterial, ReferenceMaterial)) IsModified = true;
 			}
 			if (IsModified) {
 				EditorUtility.SetDirty(TargetMaterial);
@@ -46,7 +70,7 @@ namespace Macchiato.Utility {
 			return false;
 		}
 
-		bool UpdateRenderQueueProperties(Material TargetMaterial) {
+		bool ResetRenderQueueProperties(Material TargetMaterial) {
 			bool IsTransparent = TargetMaterial.shader.name.Contains("Transparent", StringComparison.OrdinalIgnoreCase);
 			int ExpectedRenderQueue = IsTransparent ? 3000 : TargetMaterial.shader.renderQueue;
 			if (TargetMaterial.renderQueue == ExpectedRenderQueue) return false;
@@ -54,19 +78,19 @@ namespace Macchiato.Utility {
 			return true;
 		}
 
-		bool UpdateGPUInstancingProperties(Material TargetMaterial) {
+		bool UpdateGPUInstancingProperties(Material TargetMaterial, Material ReferenceMaterial) {
 			bool IsDirty = false;
-			bool EnableInstancingVariants = true;
-			if (TargetMaterial.enableInstancing != EnableInstancingVariants) { TargetMaterial.enableInstancing = EnableInstancingVariants; IsDirty = true; }
+			bool NewValue = ReferenceMaterial ? ReferenceMaterial.enableInstancing : true;
+			if (TargetMaterial.enableInstancing != NewValue) { TargetMaterial.enableInstancing = NewValue; IsDirty = true; }
 			return IsDirty;
 		}
 
-		bool UpdateGlobalIlluminationProperties(Material TargetMaterial) {
+		bool UpdateGlobalIlluminationProperties(Material TargetMaterial, Material ReferenceMaterial) {
 			bool IsDirty = false;
-			MaterialGlobalIlluminationFlags GlobalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-			bool DoubleSidedGI = true;
-			if (TargetMaterial.globalIlluminationFlags != GlobalIlluminationFlags) { TargetMaterial.globalIlluminationFlags = GlobalIlluminationFlags; IsDirty = true; }
-			if (TargetMaterial.doubleSidedGI != DoubleSidedGI) { TargetMaterial.doubleSidedGI = DoubleSidedGI; IsDirty = true; }
+			MaterialGlobalIlluminationFlags NewFlag = ReferenceMaterial ? ReferenceMaterial.globalIlluminationFlags : MaterialGlobalIlluminationFlags.BakedEmissive;
+			bool NewValue = ReferenceMaterial ? ReferenceMaterial.doubleSidedGI : true;
+			if (TargetMaterial.globalIlluminationFlags != NewFlag) { TargetMaterial.globalIlluminationFlags = NewFlag; IsDirty = true; }
+			if (TargetMaterial.doubleSidedGI != NewValue) { TargetMaterial.doubleSidedGI = NewValue; IsDirty = true; }
 			return IsDirty;
 		}
 	}
