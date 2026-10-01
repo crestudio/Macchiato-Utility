@@ -21,8 +21,29 @@ namespace Macchiato.Utility {
 
 	public class ColorGenerator : EditorWindow {
 
-		const string ColorDeltaPath = "Caramel_Macchiato/ColorGenerator";
+		[SerializeField] GameObject AvatarGameObject;
+		[SerializeField] Material SourceMaterial;
+		[SerializeField] Material[] TargetMaterials = new Material[0];
+
+		[SerializeField] ColorProfile TargetColorProfile;
+
+		[SerializeField, ColorUsage(false, false)]  Color BaseColor = Color.white;
+		[SerializeField, ColorUsage(false, false)] Color ShadowColor1 = Color.black;
+		[SerializeField, ColorUsage(true, false)] Color ShadowColor2 = Color.black;
+		[SerializeField, ColorUsage(true, false)] Color ShadowColor3 = Color.black;
+		[SerializeField, ColorUsage(true, true)] Color RimLightColor = Color.white;
+		[SerializeField, ColorUsage(true, false)] Color RimShadeColor = Color.black;
+
+		SerializedObject SerializedColorGenerator;
+		SerializedProperty SerializedAvatarGameObject;
+		SerializedProperty SerializedSourceMaterial;
+		SerializedProperty SerializedTargetMaterials;
+
+		const string ColorProfilePath = "Caramel_Macchiato/ColorGenerator";
 		const string UndoGroupName = "Macchiato ColorGenerator";
+
+		int UndoGroupIndex = -1;
+		List<Material> ModifiedMaterials = new List<Material>();
 
 		static readonly string[] ShadowPropertyNames = new string[] {
 			"_ShadowColor",
@@ -30,25 +51,11 @@ namespace Macchiato.Utility {
 			"_Shadow3rdColor"
 		};
 
-		[SerializeField] Color BaseColor = Color.white;
-		[SerializeField] Color ShadowColor1 = Color.black;
-		[SerializeField] Color ShadowColor2 = Color.black;
-		[SerializeField] Color ShadowColor3 = Color.black;
-		[SerializeField, ColorUsage(true, true)] Color RimLightColor = Color.white;
-		[SerializeField] Color RimShadeColor = Color.black;
-		[SerializeField] GameObject AvatarGameObject;
-		[SerializeField] Material SourceMaterial;
-		[SerializeField] Material[] TargetMaterials = new Material[0];
-
-		SerializedObject SerializedColorGenerator;
-		SerializedProperty SerializedTargetMaterials;
-		[SerializeField] ColorDelta TargetColorDelta;
-
-		static List<ColorDelta> ColorDeltaList = new List<ColorDelta>();
-		int SelectedColorDeltaIndex;
-		bool IsEditingProfileName;
-		string EditingProfileName = string.Empty;
-		bool ShowProfileDetails;
+		static List<ColorProfile> ColorProfiles = new List<ColorProfile>();
+		int TargetProfileIndex;
+		bool IsEditingProfile = false;
+		string NewProfileName = string.Empty;
+		bool FoldProfileDetail = false;
 
 		const float BorderX = 30f;
 		float WindowColumnWidth;
@@ -66,25 +73,31 @@ namespace Macchiato.Utility {
 			ColorGenerator AppWindow = GetWindow<ColorGenerator>(true, "Macchiato ColorGenerator", true);
 			AppWindow.minSize = new Vector2(550, 500);
 			AppWindow.maxSize = new Vector2(550, 1000);
+			AppWindow.Initialize();
 		}
 
-		void OnEnable() {
-			SerializedColorGenerator = new SerializedObject(this);
-			SerializedTargetMaterials = SerializedColorGenerator.FindProperty("TargetMaterials");
+		void Initialize() {
 			AvatarGameObject = AvatarUtility.GetAvatarGameObject();
-			LoadColorDeltas();
-			if (ColorDeltaList.Count > 0) {
-				SelectedColorDeltaIndex = 0;
-				SetColorDelta(SelectedColorDeltaIndex);
+			SerializedColorGenerator = new SerializedObject(this);
+			SerializedAvatarGameObject = SerializedColorGenerator.FindProperty(nameof(AvatarGameObject));
+			SerializedSourceMaterial = SerializedColorGenerator.FindProperty(nameof(SourceMaterial));
+			SerializedTargetMaterials = SerializedColorGenerator.FindProperty(nameof(TargetMaterials));
+			LoadColorProfiles();
+			if (ColorProfiles.Count > 0) {
+				TargetProfileIndex = 0;
+				SetColorProfile(TargetProfileIndex);
 			} else {
-				CreateSampleColorDelta();
+				CreateSampleColorProfile();
 			}
 		}
 
 		void OnGUI() {
-			if (SerializedColorGenerator == null) {
-				SerializedColorGenerator = new SerializedObject(this);
-				SerializedTargetMaterials = SerializedColorGenerator.FindProperty("TargetMaterials");
+			if (SerializedColorGenerator == null || !SerializedColorGenerator.targetObject) {
+				Initialize();
+				if (SerializedColorGenerator == null) {
+					Close();
+					return;
+				}
 			}
 			SerializedColorGenerator.Update();
 			WindowColumnWidth = position.size.x / 4f;
@@ -101,7 +114,7 @@ namespace Macchiato.Utility {
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
 			DrawProfileSection();
 			EditorGUILayout.LabelField(string.Empty, GUI.skin.horizontalSlider);
-			DrawTargetMaterialSection();
+			DrawMaterialSection();
 			SerializedColorGenerator.ApplyModifiedProperties();
 		}
 
@@ -117,7 +130,7 @@ namespace Macchiato.Utility {
 			EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			AvatarGameObject = (GameObject)EditorGUILayout.ObjectField(GetTranslatedString("String_Avatar"), AvatarGameObject, typeof(GameObject), true);
+			EditorGUILayout.PropertyField(SerializedAvatarGameObject, new GUIContent(GetTranslatedString("String_Avatar")));
 			if (GUILayout.Button(GetTranslatedString("String_Extract"), GUILayout.Width(70f))) {
 				AddAvatarMaterials();
 			}
@@ -125,7 +138,7 @@ namespace Macchiato.Utility {
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			SourceMaterial = (Material)EditorGUILayout.ObjectField(GetTranslatedString("String_SourceMaterial"), SourceMaterial, typeof(Material), false);
+			EditorGUILayout.PropertyField(SerializedSourceMaterial, new GUIContent(GetTranslatedString("String_SourceMaterial")));
 			if (GUILayout.Button(GetTranslatedString("String_Extract"), GUILayout.Width(70f))) {
 				ExtractMaterialColors();
 			}
@@ -135,21 +148,21 @@ namespace Macchiato.Utility {
 
 		void DrawColorPreviewSection() {
 			GUIStyle CenteredStyle = new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleCenter };
-			Rect PreviewRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(70f));
-			float ColumnWidth = PreviewRect.width / 4f;
-			EditorGUI.DrawRect(new Rect(PreviewRect.x, PreviewRect.y, PreviewRect.width, PreviewRect.height), BaseColor);
-			EditorGUI.DrawRect(new Rect(PreviewRect.x + ColumnWidth, PreviewRect.y, ColumnWidth, PreviewRect.height), ShadowColor1);
-			EditorGUI.DrawRect(new Rect(PreviewRect.x + ColumnWidth * 2f, PreviewRect.y, ColumnWidth, PreviewRect.height), ShadowColor2);
-			EditorGUI.DrawRect(new Rect(PreviewRect.x + ColumnWidth * 3f, PreviewRect.y, ColumnWidth, PreviewRect.height), ShadowColor3);
-			Rect RimPreviewRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(30f));
+			Rect ColorRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(70f));
+			Rect RimColorRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(30f));
+			float ColumnWidth = ColorRect.width / 4f;
 			Color RimLightPreview = AddColor(BaseColor, RimLightColor);
 			Color RimLightShadowPreview = AddColor(ShadowColor1, RimLightColor);
-			Color RimShadePreview1 = MultiplyColor(ShadowColor2, RimShadeColor);
-			Color RimShadePreview2 = MultiplyColor(ShadowColor3, RimShadeColor);
-			EditorGUI.DrawRect(new Rect(RimPreviewRect.x, RimPreviewRect.y, RimPreviewRect.width / 4f, RimPreviewRect.height), RimLightPreview);
-			EditorGUI.DrawRect(new Rect(RimPreviewRect.x + RimPreviewRect.width / 4f, RimPreviewRect.y, RimPreviewRect.width / 4f, RimPreviewRect.height), RimLightShadowPreview);
-			EditorGUI.DrawRect(new Rect(RimPreviewRect.x + RimPreviewRect.width / 2f, RimPreviewRect.y, RimPreviewRect.width / 4f, RimPreviewRect.height), RimShadePreview1);
-			EditorGUI.DrawRect(new Rect(RimPreviewRect.x + RimPreviewRect.width * 0.75f, RimPreviewRect.y, RimPreviewRect.width / 4f, RimPreviewRect.height), RimShadePreview2);
+			Color RimShadePreview = MultiplyColor(ShadowColor2, RimShadeColor);
+			Color RimShadeShadowPreview = MultiplyColor(ShadowColor3, RimShadeColor);
+			EditorGUI.DrawRect(new Rect(ColorRect.x, ColorRect.y, ColorRect.width, ColorRect.height), BaseColor);
+			EditorGUI.DrawRect(new Rect(ColorRect.x + ColumnWidth, ColorRect.y, ColumnWidth, ColorRect.height), ShadowColor1);
+			EditorGUI.DrawRect(new Rect(ColorRect.x + ColumnWidth * 2f, ColorRect.y, ColumnWidth, ColorRect.height), ShadowColor2);
+			EditorGUI.DrawRect(new Rect(ColorRect.x + ColumnWidth * 3f, ColorRect.y, ColumnWidth, ColorRect.height), ShadowColor3);
+			EditorGUI.DrawRect(new Rect(RimColorRect.x, RimColorRect.y, RimColorRect.width / 4f, RimColorRect.height), RimLightPreview);
+			EditorGUI.DrawRect(new Rect(RimColorRect.x + RimColorRect.width / 4f, RimColorRect.y, RimColorRect.width / 4f, RimColorRect.height), RimLightShadowPreview);
+			EditorGUI.DrawRect(new Rect(RimColorRect.x + RimColorRect.width / 2f, RimColorRect.y, RimColorRect.width / 4f, RimColorRect.height), RimShadePreview);
+			EditorGUI.DrawRect(new Rect(RimColorRect.x + RimColorRect.width * 0.75f, RimColorRect.y, RimColorRect.width / 4f, RimColorRect.height), RimShadeShadowPreview);
 			GUILayout.BeginHorizontal();
 			GUILayout.Label(GetTranslatedString("String_BaseColor"), CenteredStyle, GUILayout.Width(Column4Width));
 			GUILayout.Label(GetTranslatedString("String_Shadow1Color"), CenteredStyle, GUILayout.Width(Column4Width));
@@ -164,14 +177,14 @@ namespace Macchiato.Utility {
 
 		void DrawColorFieldSection() {
 			GUILayout.BeginHorizontal();
-			DrawColorField(BaseColor, value => BaseColor = value, false, Column4Width);
-			DrawColorField(ShadowColor1, value => ShadowColor1 = value, false, Column4Width);
-			DrawColorField(ShadowColor2, value => ShadowColor2 = value, false, Column4Width);
-			DrawColorField(ShadowColor3, value => ShadowColor3 = value, false, Column4Width);
+			DrawColorField(BaseColor, Value => BaseColor = Value, false, Column4Width);
+			DrawColorField(ShadowColor1, Value => ShadowColor1 = Value, false, Column4Width);
+			DrawColorField(ShadowColor2, Value => ShadowColor2 = Value, false, Column4Width);
+			DrawColorField(ShadowColor3, Value => ShadowColor3 = Value, false, Column4Width);
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
-			DrawColorField(RimLightColor, value => RimLightColor = value, true, Column2Width);
-			DrawColorField(RimShadeColor, value => RimShadeColor = value, false, Column2Width);
+			DrawColorField(RimLightColor, Value => RimLightColor = Value, true, Column2Width);
+			DrawColorField(RimShadeColor, Value => RimShadeColor = Value, false, Column2Width);
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 			if (GUILayout.Button(GetTranslatedString("String_Recalculate"), EditorStyles.miniButtonLeft)) {
@@ -189,11 +202,6 @@ namespace Macchiato.Utility {
 			GUILayout.EndHorizontal();
 		}
 
-		void DrawColorField(Color TargetColor, Action<Color> SetColor, bool HDR, float TargetWidth) {
-			Color NewColor = EditorGUILayout.ColorField(GUIContent.none, TargetColor, true, true, HDR, GUILayout.Width(TargetWidth));
-			if (NewColor != TargetColor) SetColor(NewColor);
-		}
-
 		void DrawOklabSection() {
 			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
@@ -208,96 +216,97 @@ namespace Macchiato.Utility {
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
 			GUILayout.Label(GetTranslatedString("String_Profile"), GUILayout.Width(70f));
-			string[] ProfileNameList = ColorDeltaList.Select(Item => Item.Name).ToArray();
+			string[] ProfileNameList = ColorProfiles.Select(Item => Item.Name).ToArray();
 			if (ProfileNameList.Length > 0) {
-				int NewSelectedProfileIndex = EditorGUILayout.Popup(SelectedColorDeltaIndex, ProfileNameList);
-				if (NewSelectedProfileIndex != SelectedColorDeltaIndex) {
-					SetColorDelta(NewSelectedProfileIndex);
+				int NewSelectedProfileIndex = EditorGUILayout.Popup(TargetProfileIndex, ProfileNameList);
+				if (NewSelectedProfileIndex != TargetProfileIndex) {
+					SetColorProfile(NewSelectedProfileIndex);
 				}
 			}
 			if (GUILayout.Button(GetTranslatedString("String_Create"), EditorStyles.miniButtonLeft, GUILayout.Width(55f))) {
 				CreateColorDelta();
 			}
 			if (GUILayout.Button(GetTranslatedString("String_Edit"), EditorStyles.miniButtonMid, GUILayout.Width(55f))) {
-				BeginEditProfileName();
+				EditProfile();
 			}
 			if (GUILayout.Button(GetTranslatedString("String_Import"), EditorStyles.miniButtonMid, GUILayout.Width(55f))) {
-				ImportColorDelta();
+				ImportColorProfile();
 			}
 			if (GUILayout.Button(GetTranslatedString("String_Export"), EditorStyles.miniButtonRight, GUILayout.Width(55f))) {
-				ExportColorDelta();
+				ExportColorProfile();
 			}
 			GUILayout.Space(BorderX);
 			GUILayout.EndHorizontal();
-			if (IsEditingProfileName) {
+			if (IsEditingProfile) {
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(BorderX);
-				EditingProfileName = EditorGUILayout.TextField(EditingProfileName);
+				NewProfileName = EditorGUILayout.TextField(NewProfileName);
 				if (GUILayout.Button(GetTranslatedString("String_Save"), EditorStyles.miniButtonLeft, GUILayout.Width(55f))) {
-					SaveEditedProfileName();
+					SaveEditedProfile();
 				}
 				if (GUILayout.Button(GetTranslatedString("String_Cancel"), EditorStyles.miniButtonRight, GUILayout.Width(55f))) {
-					IsEditingProfileName = false;
+					IsEditingProfile = false;
 				}
 				GUILayout.Space(BorderX);
 				GUILayout.EndHorizontal();
 			}
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
-			ShowProfileDetails = EditorGUILayout.Foldout(ShowProfileDetails, GetTranslatedString("String_ProfileDetails"), true);
+			FoldProfileDetail = EditorGUILayout.Foldout(FoldProfileDetail, GetTranslatedString("String_ProfileDetails"), true);
 			GUILayout.Space(BorderX);
 			GUILayout.EndHorizontal();
-			if (ShowProfileDetails) {
+			if (FoldProfileDetail) {
 				using (new EditorGUI.DisabledScope(true)) {
 					GUILayout.BeginHorizontal();
 					GUILayout.Space(BorderX);
-					EditorGUILayout.TextField(GetTranslatedString("String_ReferenceColor"), TargetColorDelta.ReferenceColor);
+					EditorGUILayout.TextField(GetTranslatedString("String_ReferenceColor"), TargetColorProfile.ReferenceColor);
 					GUILayout.Space(BorderX);
 					GUILayout.EndHorizontal();
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(BorderX);
-					EditorGUILayout.Vector3Field(GetTranslatedString("String_Shadow1Delta"), TargetColorDelta.ColorDelta1);
-					GUILayout.Space(BorderX);
-					GUILayout.EndHorizontal();
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(BorderX);
-					EditorGUILayout.Vector3Field(GetTranslatedString("String_Shadow2Delta"), TargetColorDelta.ColorDelta2);
-					GUILayout.Space(BorderX);
-					GUILayout.EndHorizontal();
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(BorderX);
-					EditorGUILayout.Vector3Field(GetTranslatedString("String_Shadow3Delta"), TargetColorDelta.ColorDelta3);
-					GUILayout.Space(BorderX);
-					GUILayout.EndHorizontal();
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(BorderX);
-					EditorGUILayout.Vector3Field(GetTranslatedString("String_RimLightDelta"), TargetColorDelta.RimLightDelta);
-					GUILayout.Space(BorderX);
-					GUILayout.EndHorizontal();
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(BorderX);
-					EditorGUILayout.Vector3Field(GetTranslatedString("String_RimShadeDelta"), TargetColorDelta.RimShadeDelta);
-					GUILayout.Space(BorderX);
-					GUILayout.EndHorizontal();
+					DrawColorDeltaField(GetTranslatedString("String_Shadow1Delta"), TargetColorProfile.ColorDelta1);
+					DrawColorDeltaField(GetTranslatedString("String_Shadow2Delta"), TargetColorProfile.ColorDelta2);
+					DrawColorDeltaField(GetTranslatedString("String_Shadow3Delta"), TargetColorProfile.ColorDelta3);
+					DrawColorDeltaField(GetTranslatedString("String_RimLightDelta"), TargetColorProfile.RimLightDelta);
+					DrawColorDeltaField(GetTranslatedString("String_RimShadeDelta"), TargetColorProfile.RimShadeDelta);
 				}
 			}
 		}
 
-		void DrawTargetMaterialSection() {
+		void DrawMaterialSection() {
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
 			EditorGUILayout.PropertyField(SerializedTargetMaterials, new GUIContent(GetTranslatedString("String_TargetMaterials")));
 			if (GUILayout.Button(GetTranslatedString("String_Apply"), EditorStyles.miniButtonLeft, GUILayout.Width(60f))) {
-				ApplyToMaterials();
+				UpdateMaterials();
 				Repaint();
 			}
 			if (GUILayout.Button(GetTranslatedString("String_Undo"), EditorStyles.miniButtonRight, GUILayout.Width(60f))) {
-				Undo.PerformUndo();
+				RevertMaterialProperties();
 				Repaint();
 			}
 			GUILayout.Space(BorderX);
 			GUILayout.EndHorizontal();
 	}
+
+		void DrawColorField(Color TargetColor, Action<Color> SetColor, bool HDR, float TargetWidth) {
+			Color NewColor = EditorGUILayout.ColorField(GUIContent.none, TargetColor, true, true, HDR, GUILayout.Width(TargetWidth));
+			if (NewColor != TargetColor) SetColor(NewColor);
+		}
+
+		void DrawColorDeltaField(string TargetColor, Vector3 TargetValue) {
+			float LabelWidth = 15f;
+			float FloatWidth = 106f;
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(BorderX);
+			GUILayout.Label(TargetColor, GUILayout.Width(100f));
+			GUILayout.Label("H", GUILayout.Width(LabelWidth));
+			TargetValue.x = EditorGUILayout.FloatField(TargetValue.x, GUILayout.Width(FloatWidth));
+			GUILayout.Label("S", GUILayout.Width(LabelWidth));
+			TargetValue.y = EditorGUILayout.FloatField(TargetValue.y, GUILayout.Width(FloatWidth));
+			GUILayout.Label("V", GUILayout.Width(LabelWidth));
+			TargetValue.z = EditorGUILayout.FloatField(TargetValue.z, GUILayout.Width(FloatWidth));
+			GUILayout.Space(BorderX);
+			GUILayout.EndHorizontal();
+		}
 
 		void AddAvatarMaterials() {
 			Material[] AvatarMaterials = AvatarUtility.GetAvatarMaterials(AvatarGameObject);
@@ -307,78 +316,80 @@ namespace Macchiato.Utility {
 
 		void ExtractMaterialColors() {
 			if (!SourceMaterial || GetShaderType(SourceMaterial) != ShaderType.lilToon) return;
-
 			if (IsPropertyActive(SourceMaterial, "_UseShadow")) {
-				BaseColor = Color.white;
-				ShadowColor1 = SourceMaterial.GetColor("_ShadowColor");
+				Color SourceShadowColor1 = SourceMaterial.GetColor("_ShadowColor");
 				Color SourceShadowColor2 = SourceMaterial.GetColor("_Shadow2ndColor");
 				Color SourceShadowColor3 = SourceMaterial.GetColor("_Shadow3rdColor");
+				ShadowColor1 = SourceShadowColor1;
 				ShadowColor2 = SourceShadowColor2.a != 0f ? SourceShadowColor2 : ShadowColor1;
 				ShadowColor3 = SourceShadowColor3.a != 0f ? SourceShadowColor3 : ShadowColor2;
-			} else {
-				BaseColor = Color.white;
-				ShadowColor1 = Color.black;
-				ShadowColor2 = Color.black;
-				ShadowColor3 = Color.black;
 			}
-
-			RimLightColor = IsPropertyActive(SourceMaterial, "_UseRim")
-				? SourceMaterial.GetColor("_RimColor")
-				: ShadowColor1;
-			RimShadeColor = IsPropertyActive(SourceMaterial, "_UseRimShade")
-				? SourceMaterial.GetColor("_RimShadeColor")
-				: ShadowColor3;
+			if (IsPropertyActive(SourceMaterial, "_UseRim")) {
+				RimLightColor = SourceMaterial.GetColor("_RimColor");
+			}
+			if (IsPropertyActive(SourceMaterial, "_UseRimShade")) {
+				RimShadeColor = SourceMaterial.GetColor("_RimShadeColor");
+			}
 			Repaint();
 		}
 
-		void ApplyToMaterials() {
-			int UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
-			bool HasChanges = false;
-			foreach (Material TargetMaterial in TargetMaterials ?? new Material[0]) {
+		bool UpdateMaterials() {
+			int NewUndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
+			bool IsModified = false;
+			int ModifiedCount = 0;
+			List<Material> NewModifiedMaterials = new List<Material>();
+			foreach (Material TargetMaterial in TargetMaterials) {
 				if (!TargetMaterial || GetShaderType(TargetMaterial) != ShaderType.lilToon) continue;
-				bool HasMaterialChanges = false;
-
-				if (IsPropertyActive(TargetMaterial, "_UseShadow")) {
-					HasMaterialChanges |= HasColorPropertyChange(TargetMaterial, ShadowPropertyNames[0], ShadowColor1);
-					HasMaterialChanges |= HasColorPropertyChange(TargetMaterial, ShadowPropertyNames[1], ShadowColor2);
-					HasMaterialChanges |= HasColorPropertyChange(TargetMaterial, ShadowPropertyNames[2], ShadowColor3);
-				}
-				if (IsPropertyActive(TargetMaterial, "_UseRim")) {
-					HasMaterialChanges |= HasColorPropertyChange(TargetMaterial, "_RimColor", RimLightColor);
-				}
-				if (IsPropertyActive(TargetMaterial, "_UseRimShade")) {
-					HasMaterialChanges |= HasColorPropertyChange(TargetMaterial, "_RimShadeColor", RimShadeColor);
-				}
-
-				if (!HasMaterialChanges) continue;
+				bool NeedUpdate = false;
+				NeedUpdate |= NeedColorUpdate(TargetMaterial, ShadowPropertyNames[0], ShadowColor1);
+				NeedUpdate |= NeedColorUpdate(TargetMaterial, ShadowPropertyNames[1], ShadowColor2);
+				NeedUpdate |= NeedColorUpdate(TargetMaterial, ShadowPropertyNames[2], ShadowColor3);
+				NeedUpdate |= NeedColorUpdate(TargetMaterial, "_RimColor", RimLightColor);
+				NeedUpdate |= NeedColorUpdate(TargetMaterial, "_RimShadeColor", RimShadeColor);
+				if (!NeedUpdate) continue;
 				Undo.RecordObject(TargetMaterial, UndoGroupName);
-				if (IsPropertyActive(TargetMaterial, "_UseShadow")) {
-					SetColorProperty(TargetMaterial, ShadowPropertyNames[0], ShadowColor1);
-					SetColorProperty(TargetMaterial, ShadowPropertyNames[1], ShadowColor2);
-					SetColorProperty(TargetMaterial, ShadowPropertyNames[2], ShadowColor3);
-				}
-				if (IsPropertyActive(TargetMaterial, "_UseRim")) {
-					SetColorProperty(TargetMaterial, "_RimColor", RimLightColor);
-				}
-				if (IsPropertyActive(TargetMaterial, "_UseRimShade")) {
-					SetColorProperty(TargetMaterial, "_RimShadeColor", RimShadeColor);
-				}
+				SetColorProperty(TargetMaterial, ShadowPropertyNames[0], ShadowColor1);
+				SetColorProperty(TargetMaterial, ShadowPropertyNames[1], ShadowColor2);
+				SetColorProperty(TargetMaterial, ShadowPropertyNames[2], ShadowColor3);
+				SetColorProperty(TargetMaterial, "_RimColor", RimLightColor);
+				SetColorProperty(TargetMaterial, "_RimShadeColor", RimShadeColor);
 				EditorUtility.SetDirty(TargetMaterial);
-				HasChanges = true;
-				Debug.Log($"[Macchiato] {TargetMaterial.name} 머테리얼에 설정을 적용하였습니다");
+				NewModifiedMaterials.Add(TargetMaterial);
+				IsModified = true;
+				ModifiedCount++;
 			}
-			if (HasChanges) {
-				Undo.CollapseUndoOperations(UndoGroupIndex);
+			Debug.Log($"[Macchiato] {string.Format(GetTranslatedString("COMPLETED_UPDATEMATERIAL"), ModifiedCount)}");
+			if (IsModified) {
+				Undo.FlushUndoRecordObjects();
+				Undo.CollapseUndoOperations(NewUndoGroupIndex);
+				AssetDatabase.SaveAssets();
+				UndoGroupIndex = NewUndoGroupIndex;
+				ModifiedMaterials = NewModifiedMaterials;
+				return true;
 			}
+			return false;
 		}
 
-		bool HasColorPropertyChange(Material TargetMaterial, string PropertyName, Color NewColor) {
+		bool RevertMaterialProperties() {
+			if (UndoGroupIndex != -1) return false;
+			Undo.RevertAllDownToGroup(UndoGroupIndex);
+			foreach (Material TargetMaterial in ModifiedMaterials) {
+				if (!TargetMaterial) continue;
+				EditorUtility.SetDirty(TargetMaterial);
+			}
+			AssetDatabase.SaveAssets();
+			UndoGroupIndex = -1;
+			ModifiedMaterials.Clear();
+			return true;
+		}
+
+		bool NeedColorUpdate(Material TargetMaterial, string PropertyName, Color NewColor) {
 			return TargetMaterial.HasProperty(PropertyName) && TargetMaterial.GetColor(PropertyName) != NewColor;
 		}
 
 		void CreateColorDelta() {
-			string NewProfileName = GetUniqueProfileName(SourceMaterial ? SourceMaterial.name : $"ColorGenerator_{Random.Range(1000, 10000)}");
-			ColorDelta NewColorDelta = ColorGeneratorUtility.CreateColorDelta(
+			string NewProfileName = GetProfileName(SourceMaterial ? SourceMaterial.name : $"ColorGenerator_{Random.Range(1000, 10000)}");
+			ColorProfile NewColorProfile = ColorGeneratorUtility.CreateColorProfile(
 				NewProfileName,
 				BaseColor,
 				ShadowColor1,
@@ -387,128 +398,125 @@ namespace Macchiato.Utility {
 				RimLightColor,
 				RimShadeColor
 			);
-			ColorDeltaList.Add(NewColorDelta);
-			SelectedColorDeltaIndex = ColorDeltaList.Count - 1;
-			TargetColorDelta = NewColorDelta;
-			BeginEditProfileName();
-			SaveColorDelta();
-			Debug.Log($"[Macchiato] {NewProfileName} 설정을 생성하였습니다");
+			ColorProfiles.Add(NewColorProfile);
+			TargetProfileIndex = ColorProfiles.Count - 1;
+			TargetColorProfile = NewColorProfile;
+			EditProfile();
+			SaveColorProfile();
 		}
 
-		void BeginEditProfileName() {
-			if (ColorDeltaList.Count == 0) return;
-			EditingProfileName = TargetColorDelta.Name;
-			IsEditingProfileName = true;
+		void EditProfile() {
+			if (ColorProfiles.Count == 0) return;
+			NewProfileName = TargetColorProfile.Name;
+			IsEditingProfile = true;
 		}
 
-		void SaveEditedProfileName() {
-			if (string.IsNullOrWhiteSpace(EditingProfileName)) return;
-			string OldProfileName = TargetColorDelta.Name;
-			string NewProfileName = GetUniqueProfileName(EditingProfileName, SelectedColorDeltaIndex);
-			TargetColorDelta.Name = NewProfileName;
-			ColorDeltaList[SelectedColorDeltaIndex] = TargetColorDelta;
-			IsEditingProfileName = false;
-			DeleteProfileFile(OldProfileName, NewProfileName);
-			SaveColorDelta();
+		void SaveEditedProfile() {
+			if (string.IsNullOrWhiteSpace(this.NewProfileName)) return;
+			string OldProfileName = TargetColorProfile.Name;
+			string NewProfileName = GetProfileName(this.NewProfileName, TargetProfileIndex);
+			TargetColorProfile.Name = NewProfileName;
+			ColorProfiles[TargetProfileIndex] = TargetColorProfile;
+			IsEditingProfile = false;
+			DeleteColorProfile(OldProfileName, NewProfileName);
+			SaveColorProfile();
 		}
 
-		string GetUniqueProfileName(string BaseName, int IgnoreIndex = -1) {
-			string SanitizedName = AssetUtility.SanitizeString(BaseName.Trim());
-			if (string.IsNullOrEmpty(SanitizedName)) SanitizedName = "ColorGenerator";
-			string CandidateName = SanitizedName;
+		string GetProfileName(string TargetName, int IgnoreIndex = -1) {
+			string NewProfileName = AssetUtility.SanitizeString(TargetName.Trim());
+			if (string.IsNullOrEmpty(NewProfileName)) NewProfileName = "ColorGenerator";
+			string NewFileName = NewProfileName;
 			int Suffix = 2;
 			while (true) {
 				bool IsDuplicate = false;
-				for (int Index = 0; Index < ColorDeltaList.Count; Index++) {
-					if (Index != IgnoreIndex && ColorDeltaList[Index].Name == CandidateName) {
+				for (int Index = 0; Index < ColorProfiles.Count; Index++) {
+					if (Index != IgnoreIndex && ColorProfiles[Index].Name == NewFileName) {
 						IsDuplicate = true;
 						break;
 					}
 				}
-				if (!IsDuplicate) return CandidateName;
-				CandidateName = $"{SanitizedName}_{Suffix++}";
+				if (!IsDuplicate) return NewFileName;
+				NewFileName = $"{NewProfileName}_{Suffix++}";
 			}
 		}
 
-		void DeleteProfileFile(string OldProfileName, string NewProfileName) {
+		void DeleteColorProfile(string OldProfileName, string NewProfileName) {
 			if (string.IsNullOrEmpty(OldProfileName) || OldProfileName == NewProfileName) return;
-			string OldFilePath = Path.Combine(GetColorDeltaDirectory(), $"{AssetUtility.SanitizeString(OldProfileName)}.json");
-			if (File.Exists(OldFilePath)) {
-				File.Delete(OldFilePath);
-				AssetDatabase.Refresh();
-			}
+			string OldFilePath = Path.Combine(GetColorProfileDirectory(), $"{AssetUtility.SanitizeString(OldProfileName)}.json");
+			if (File.Exists(OldFilePath)) File.Delete(OldFilePath);
+			if (File.Exists($"{OldFilePath}.meta")) File.Delete($"{OldFilePath}.meta");
+			AssetDatabase.Refresh();
 		}
 
-		void LoadColorDeltas() {
-			string SaveDirectory = GetColorDeltaDirectory();
-			if (!Directory.Exists(SaveDirectory)) {
-				Directory.CreateDirectory(SaveDirectory);
+		void LoadColorProfiles() {
+			string ColorProfilePath = GetColorProfileDirectory();
+			if (!Directory.Exists(ColorProfilePath)) {
+				Directory.CreateDirectory(ColorProfilePath);
 			}
-			ColorDeltaList.Clear();
-			foreach (string JSONFile in Directory.GetFiles(SaveDirectory, "*.json").OrderBy(Item => Item)) {
-				if (TryReadColorDelta(JSONFile, out ColorDelta ColorDeltaData)) {
-					ColorDeltaList.Add(ColorDeltaData);
+			ColorProfiles.Clear();
+			foreach (string TargetJSON in Directory.GetFiles(ColorProfilePath, "*.json").OrderBy(Item => Item)) {
+				if (TryLoadColorProfile(TargetJSON, out ColorProfile TargetColorProfile)) {
+					ColorProfiles.Add(TargetColorProfile);
 				}
 			}
 		}
 
-		bool TryReadColorDelta(string JSONFilePath, out ColorDelta TargetColorDelta) {
-			TargetColorDelta = default;
+		bool TryLoadColorProfile(string JSONFilePath, out ColorProfile TargetColorProfile) {
+			TargetColorProfile = default;
 			try {
 				string ColorDeltaJSON = File.ReadAllText(JSONFilePath);
-				TargetColorDelta = JsonUtility.FromJson<ColorDelta>(ColorDeltaJSON);
-				return !string.IsNullOrEmpty(TargetColorDelta.Name);
-			} catch (Exception Exception) {
-				Debug.LogWarning($"[Macchiato] ColorDelta 파일을 읽지 못했습니다: {JSONFilePath}\n{Exception.Message}");
+				TargetColorProfile = JsonUtility.FromJson<ColorProfile>(ColorDeltaJSON);
+				return !string.IsNullOrEmpty(TargetColorProfile.Name);
+			} catch {
 				return false;
 			}
 		}
 
-		void ImportColorDelta() {
-			string LoadPath = EditorUtility.OpenFilePanel(
-				GetTranslatedString("String_ImportColorDelta"),
+		void ImportColorProfile() {
+			string TargetJSONPath = EditorUtility.OpenFilePanel(
+				UndoGroupName,
 				Application.dataPath,
 				"json"
 			);
-			if (string.IsNullOrEmpty(LoadPath)) return;
-			if (!TryReadColorDelta(LoadPath, out ColorDelta ImportedColorDelta)) return;
-			ImportedColorDelta.Name = GetUniqueProfileName(ImportedColorDelta.Name);
-			ColorDeltaList.Add(ImportedColorDelta);
-			SelectedColorDeltaIndex = ColorDeltaList.Count - 1;
-			TargetColorDelta = ImportedColorDelta;
-			SaveColorDelta();
+			if (string.IsNullOrEmpty(TargetJSONPath)) return;
+			if (!TryLoadColorProfile(TargetJSONPath, out ColorProfile ImportedColorDelta)) return;
+			ImportedColorDelta.Name = GetProfileName(ImportedColorDelta.Name);
+			ColorProfiles.Add(ImportedColorDelta);
+			TargetProfileIndex = ColorProfiles.Count - 1;
+			TargetColorProfile = ImportedColorDelta;
+			SaveColorProfile();
 			Repaint();
 		}
 
-		void ExportColorDelta() {
-			if (ColorDeltaList.Count == 0) return;
-			string DefaultName = string.IsNullOrEmpty(TargetColorDelta.Name) ? "ColorGenerator" : TargetColorDelta.Name;
-			string SavePath = EditorUtility.SaveFilePanel(
-				GetTranslatedString("String_ExportColorDelta"),
+		void ExportColorProfile() {
+			if (ColorProfiles.Count == 0) return;
+			string TargetName = string.IsNullOrEmpty(TargetColorProfile.Name) ? "ColorGenerator" : TargetColorProfile.Name;
+			string TargetPath = EditorUtility.SaveFilePanel(
+				UndoGroupName,
 				Application.dataPath,
-				DefaultName,
+				TargetName,
 				"json"
 			);
-			if (string.IsNullOrEmpty(SavePath)) return;
-			File.WriteAllText(SavePath, JsonUtility.ToJson(TargetColorDelta, true));
+			if (string.IsNullOrEmpty(TargetPath)) return;
+			File.WriteAllText(TargetPath, JsonUtility.ToJson(TargetColorProfile, true));
 		}
 
-		void SaveColorDelta() {
-			if (string.IsNullOrEmpty(TargetColorDelta.Name)) return;
-			string SaveDirectory = GetColorDeltaDirectory();
-			if (!Directory.Exists(SaveDirectory)) Directory.CreateDirectory(SaveDirectory);
-			string JSONFilePath = Path.Combine(SaveDirectory, $"{AssetUtility.SanitizeString(TargetColorDelta.Name)}.json");
-			File.WriteAllText(JSONFilePath, JsonUtility.ToJson(TargetColorDelta, true));
+		void SaveColorProfile() {
+			if (string.IsNullOrEmpty(TargetColorProfile.Name)) return;
+			string ColorProfilePath = GetColorProfileDirectory();
+			if (!Directory.Exists(ColorProfilePath)) Directory.CreateDirectory(ColorProfilePath);
+			string TargetPath = Path.Combine(ColorProfilePath, $"{AssetUtility.SanitizeString(TargetColorProfile.Name)}.json");
+			File.WriteAllText(TargetPath, JsonUtility.ToJson(TargetColorProfile, true));
 			AssetDatabase.Refresh();
 		}
 
-		string GetColorDeltaDirectory() {
-			return Path.Combine(Application.dataPath, ColorDeltaPath);
+		string GetColorProfileDirectory() {
+			return Path.Combine(Application.dataPath, ColorProfilePath);
 		}
 
-		void CreateSampleColorDelta() {
-			ColorDelta SampleColorDelta = new ColorDelta {
-				Name = "Glossy",
+		void CreateSampleColorProfile() {
+			ColorProfile NewColorDelta = new ColorProfile {
+				Name = "Sample",
 				ReferenceColor = "#FFF0EF",
 				ColorDelta1 = new Vector3(-11f, 4f, -9f),
 				ColorDelta2 = new Vector3(-4f, 6f, 1f),
@@ -516,18 +524,19 @@ namespace Macchiato.Utility {
 				RimLightDelta = new Vector3(12f, 13f, 9f),
 				RimShadeDelta = new Vector3(-5f, -22f, 2f)
 			};
-			TargetColorDelta = SampleColorDelta;
-			ColorDeltaList.Add(SampleColorDelta);
-			SelectedColorDeltaIndex = 0;
-			SaveColorDelta();
+			TargetColorProfile = NewColorDelta;
+			ColorProfiles.Add(NewColorDelta);
+			TargetProfileIndex = 0;
+			SaveColorProfile();
+			SetColorProfile(TargetProfileIndex);
 		}
 
-		void SetColorDelta(int TargetIndex) {
-			if (TargetIndex < 0 || TargetIndex >= ColorDeltaList.Count) return;
-			SelectedColorDeltaIndex = TargetIndex;
-			TargetColorDelta = ColorDeltaList[TargetIndex];
-			ColorGeneratorColors GeneratedColors = ColorGeneratorUtility.GenerateColors(TargetColorDelta);
-			SetColors(GeneratedColors);
+		void SetColorProfile(int TargetIndex) {
+			if (TargetIndex < 0 || TargetIndex >= ColorProfiles.Count) return;
+			TargetProfileIndex = TargetIndex;
+			TargetColorProfile = ColorProfiles[TargetIndex];
+			ColorProfileColor NewColorProfileColor = ColorGeneratorUtility.CalculateColors(TargetColorProfile);
+			SetColors(NewColorProfileColor);
 		}
 
 		void CalculateFromColor(int TargetColorIndex) {
@@ -538,31 +547,31 @@ namespace Macchiato.Utility {
 				3 => ShadowColor3,
 				_ => BaseColor
 			};
-			ColorGeneratorColors CalculatedColors = TargetColorIndex switch {
-				0 => ColorGeneratorUtility.CalculateFromBaseColor(TargetColor, TargetColorDelta),
-				1 => ColorGeneratorUtility.CalculateFromShadowColor1(TargetColor, TargetColorDelta),
-				2 => ColorGeneratorUtility.CalculateFromShadowColor2(TargetColor, TargetColorDelta),
-				3 => ColorGeneratorUtility.CalculateFromShadowColor3(TargetColor, TargetColorDelta),
-				_ => ColorGeneratorUtility.GenerateColors(TargetColorDelta)
+			ColorProfileColor NewColorProfileColor = TargetColorIndex switch {
+				0 => ColorGeneratorUtility.CalculateFromBaseColor(TargetColor, TargetColorProfile),
+				1 => ColorGeneratorUtility.CalculateFromShadowColor1(TargetColor, TargetColorProfile),
+				2 => ColorGeneratorUtility.CalculateFromShadowColor2(TargetColor, TargetColorProfile),
+				3 => ColorGeneratorUtility.CalculateFromShadowColor3(TargetColor, TargetColorProfile),
+				_ => ColorGeneratorUtility.CalculateColors(TargetColorProfile)
 			};
-			SetColors(CalculatedColors);
+			SetColors(NewColorProfileColor);
 			Repaint();
 		}
 
 		void CalculateOklabGradient() {
-			Macchiato.Core.ColorUtility.OklabGradient Gradient = Macchiato.Core.ColorUtility.GetOklabGradient(BaseColor, ShadowColor3);
-			ShadowColor1 = Gradient.Shadow1;
-			ShadowColor2 = Gradient.Shadow2;
+			ColorHelper.OklabGradient NewGradient = ColorHelper.GetOklabGradient(BaseColor, ShadowColor3);
+			ShadowColor1 = NewGradient.Shadow1;
+			ShadowColor2 = NewGradient.Shadow2;
 			Repaint();
 		}
 
-		void SetColors(ColorGeneratorColors TargetColors) {
-			BaseColor = TargetColors.BaseColor;
-			ShadowColor1 = TargetColors.ShadowColor1;
-			ShadowColor2 = TargetColors.ShadowColor2;
-			ShadowColor3 = TargetColors.ShadowColor3;
-			RimLightColor = TargetColors.RimLightColor;
-			RimShadeColor = TargetColors.RimShadeColor;
+		void SetColors(ColorProfileColor TargetColorProfileColor) {
+			BaseColor = TargetColorProfileColor.BaseColor;
+			ShadowColor1 = TargetColorProfileColor.ShadowColor1;
+			ShadowColor2 = TargetColorProfileColor.ShadowColor2;
+			ShadowColor3 = TargetColorProfileColor.ShadowColor3;
+			RimLightColor = TargetColorProfileColor.RimLightColor;
+			RimShadeColor = TargetColorProfileColor.RimShadeColor;
 		}
 
 		Color AddColor(Color Base, Color Add) {
@@ -575,10 +584,11 @@ namespace Macchiato.Utility {
 		}
 
 		Color MultiplyColor(Color Base, Color Multiply) {
+			float Alpha = Multiply.a;
 			return new Color(
-				Base.r * Multiply.r * Multiply.a,
-				Base.g * Multiply.g * Multiply.a,
-				Base.b * Multiply.b * Multiply.a,
+				Base.r * Mathf.Lerp(1f, Multiply.r, Alpha),
+				Base.g * Mathf.Lerp(1f, Multiply.g, Alpha),
+				Base.b * Mathf.Lerp(1f, Multiply.b, Alpha),
 				Base.a
 			);
 		}

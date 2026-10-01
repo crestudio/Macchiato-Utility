@@ -12,7 +12,7 @@ using Macchiato.Core;
 namespace Macchiato.Utility {
 
 	[Serializable]
-	public struct ColorDelta {
+	public struct ColorProfile {
 		public string Name;
 		public string ReferenceColor;
 		public Vector3 ColorDelta1;
@@ -22,7 +22,7 @@ namespace Macchiato.Utility {
 		public Vector3 RimShadeDelta;
 	}
 
-	public struct ColorGeneratorColors {
+	public struct ColorProfileColor {
 		public Color BaseColor;
 		public Color ShadowColor1;
 		public Color ShadowColor2;
@@ -33,18 +33,18 @@ namespace Macchiato.Utility {
 
 	public static class ColorGeneratorUtility {
 
-		public static ColorGeneratorColors GenerateColors(ColorDelta TargetColorDelta) {
-			Color BaseColor = UnityUtility.HexToColor(TargetColorDelta.ReferenceColor);
-			return CalculateFromBaseColor(BaseColor, TargetColorDelta);
+		public static ColorProfileColor CalculateColors(ColorProfile TargetColorProfile) {
+			Color BaseColor = UnityUtility.HexToColor(TargetColorProfile.ReferenceColor);
+			return CalculateFromBaseColor(BaseColor, TargetColorProfile);
 		}
 
-		public static ColorGeneratorColors CalculateFromBaseColor(Color BaseColor, ColorDelta TargetColorDelta) {
-			Color ShadowColor1 = GetDeltaColor(BaseColor, TargetColorDelta.ColorDelta1, false);
-			Color ShadowColor2 = GetDeltaColor(ShadowColor1, TargetColorDelta.ColorDelta2, false);
-			Color ShadowColor3 = GetDeltaColor(ShadowColor2, TargetColorDelta.ColorDelta3, false);
-			Color RimLightColor = GetDeltaColor(ShadowColor1, TargetColorDelta.RimLightDelta, false);
-			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorDelta.RimShadeDelta, false);
-			return new ColorGeneratorColors {
+		public static ColorProfileColor CalculateFromBaseColor(Color BaseColor, ColorProfile TargetColorProfile) {
+			Color ShadowColor1 = GetDeltaColor(BaseColor, TargetColorProfile.ColorDelta1, false);
+			Color ShadowColor2 = GetDeltaColor(ShadowColor1, TargetColorProfile.ColorDelta2, false);
+			Color ShadowColor3 = GetDeltaColor(ShadowColor2, TargetColorProfile.ColorDelta3, false);
+			Color RimLightColor = GetDeltaColor(ShadowColor1, TargetColorProfile.RimLightDelta, false);
+			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorProfile.RimShadeDelta, false);
+			return new ColorProfileColor {
 				BaseColor = BaseColor,
 				ShadowColor1 = ShadowColor1,
 				ShadowColor2 = ShadowColor2,
@@ -54,13 +54,13 @@ namespace Macchiato.Utility {
 			};
 		}
 
-		public static ColorGeneratorColors CalculateFromShadowColor1(Color ShadowColor1, ColorDelta TargetColorDelta) {
-			Color BaseColor = GetDeltaColor(ShadowColor1, TargetColorDelta.ColorDelta1, true);
-			Color ShadowColor2 = GetDeltaColor(ShadowColor1, TargetColorDelta.ColorDelta2, false);
-			Color ShadowColor3 = GetDeltaColor(ShadowColor2, TargetColorDelta.ColorDelta3, false);
-			Color RimLightColor = GetDeltaColor(ShadowColor1, TargetColorDelta.RimLightDelta, false);
-			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorDelta.RimShadeDelta, false);
-			return new ColorGeneratorColors {
+		public static ColorProfileColor CalculateFromShadowColor1(Color ShadowColor1, ColorProfile TargetColorProfile) {
+			Color BaseColor = GetDeltaColor(ShadowColor1, TargetColorProfile.ColorDelta1, true);
+			Color ShadowColor2 = GetDeltaColor(ShadowColor1, TargetColorProfile.ColorDelta2, false);
+			Color ShadowColor3 = GetDeltaColor(ShadowColor2, TargetColorProfile.ColorDelta3, false);
+			Color RimLightColor = GetDeltaColor(ShadowColor1, TargetColorProfile.RimLightDelta, false);
+			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorProfile.RimShadeDelta, false);
+			return new ColorProfileColor {
 				BaseColor = BaseColor,
 				ShadowColor1 = ShadowColor1,
 				ShadowColor2 = ShadowColor2,
@@ -70,13 +70,13 @@ namespace Macchiato.Utility {
 			};
 		}
 
-		public static ColorGeneratorColors CalculateFromShadowColor2(Color ShadowColor2, ColorDelta TargetColorDelta) {
-			Color ShadowColor1 = GetDeltaColor(ShadowColor2, TargetColorDelta.ColorDelta2, true);
-			Color BaseColor = GetDeltaColor(ShadowColor1, TargetColorDelta.ColorDelta1, true);
-			Color ShadowColor3 = GetDeltaColor(ShadowColor2, TargetColorDelta.ColorDelta3, false);
-			Color RimLightColor = GetDeltaColor(ShadowColor2, TargetColorDelta.RimLightDelta, false);
-			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorDelta.RimShadeDelta, false);
-			return new ColorGeneratorColors {
+		public static ColorProfileColor CalculateFromShadowColor2(Color ShadowColor2, ColorProfile TargetColorProfile) {
+			Color ShadowColor1 = GetDeltaColor(ShadowColor2, TargetColorProfile.ColorDelta2, true);
+			Color BaseColor = GetDeltaColor(ShadowColor1, TargetColorProfile.ColorDelta1, true);
+			Color ShadowColor3 = GetDeltaColor(ShadowColor2, TargetColorProfile.ColorDelta3, false);
+			Color RimLightColor = GetDeltaColor(ShadowColor2, TargetColorProfile.RimLightDelta, false);
+			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorProfile.RimShadeDelta, false);
+			return new ColorProfileColor {
 				BaseColor = BaseColor,
 				ShadowColor1 = ShadowColor1,
 				ShadowColor2 = ShadowColor2,
@@ -86,13 +86,13 @@ namespace Macchiato.Utility {
 			};
 		}
 
-		public static ColorGeneratorColors CalculateFromShadowColor3(Color ShadowColor3, ColorDelta TargetColorDelta) {
-			Color ShadowColor2 = GetDeltaColor(ShadowColor3, TargetColorDelta.ColorDelta3, true);
-			Color ShadowColor1 = GetDeltaColor(ShadowColor2, TargetColorDelta.ColorDelta2, true);
-			Color BaseColor = GetDeltaColor(ShadowColor1, TargetColorDelta.ColorDelta1, true);
-			Color RimLightColor = GetDeltaColor(ShadowColor1, TargetColorDelta.RimLightDelta, false);
-			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorDelta.RimShadeDelta, false);
-			return new ColorGeneratorColors {
+		public static ColorProfileColor CalculateFromShadowColor3(Color ShadowColor3, ColorProfile TargetColorProfile) {
+			Color ShadowColor2 = GetDeltaColor(ShadowColor3, TargetColorProfile.ColorDelta3, true);
+			Color ShadowColor1 = GetDeltaColor(ShadowColor2, TargetColorProfile.ColorDelta2, true);
+			Color BaseColor = GetDeltaColor(ShadowColor1, TargetColorProfile.ColorDelta1, true);
+			Color RimLightColor = GetDeltaColor(ShadowColor1, TargetColorProfile.RimLightDelta, false);
+			Color RimShadeColor = GetDeltaColor(ShadowColor3, TargetColorProfile.RimShadeDelta, false);
+			return new ColorProfileColor {
 				BaseColor = BaseColor,
 				ShadowColor1 = ShadowColor1,
 				ShadowColor2 = ShadowColor2,
@@ -102,8 +102,8 @@ namespace Macchiato.Utility {
 			};
 		}
 
-		public static ColorDelta CreateColorDelta(string ProfileName, Color BaseColor, Color ShadowColor1, Color ShadowColor2, Color ShadowColor3, Color RimLightColor, Color RimShadeColor) {
-			return new ColorDelta {
+		public static ColorProfile CreateColorProfile(string ProfileName, Color BaseColor, Color ShadowColor1, Color ShadowColor2, Color ShadowColor3, Color RimLightColor, Color RimShadeColor) {
+			return new ColorProfile {
 				Name = ProfileName,
 				ReferenceColor = UnityUtility.ColorToHex(BaseColor),
 				ColorDelta1 = GetColorDelta(BaseColor, ShadowColor1),
