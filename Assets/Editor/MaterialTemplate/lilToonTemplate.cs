@@ -767,40 +767,40 @@ namespace Macchiato.Utility {
 			if (TargetTemplateOption.UpdateBackfaceColor) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_BackfaceColor", TargetTemplateOption.BackfaceColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateShadowColor) {
+			if (TargetTemplateOption.UpdateShadowColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseShadow")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_ShadowColor", TargetTemplateOption.Shadow1Color)) IsModified = true;
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_Shadow2ndColor", TargetTemplateOption.Shadow2Color)) IsModified = true;
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_Shadow3rdColor", TargetTemplateOption.Shadow3Color)) IsModified = true;
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_ShadowBorderColor", TargetTemplateOption.ShadowBorderColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateRimShadeColor) {
+			if (TargetTemplateOption.UpdateRimShadeColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseRimShade")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_RimShadeColor", TargetTemplateOption.RimShadeColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateEmission1Color) {
+			if (TargetTemplateOption.UpdateEmission1Color && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseEmission")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_EmissionColor", TargetTemplateOption.Emission1Color)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateEmission2Color) {
+			if (TargetTemplateOption.UpdateEmission2Color && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseEmission2nd")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_Emission2ndColor", TargetTemplateOption.Emission2Color)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateBacklightColor) {
+			if (TargetTemplateOption.UpdateBacklightColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseBacklight")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_BacklightColor", TargetTemplateOption.BacklightColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateReflectionColor) {
+			if (TargetTemplateOption.UpdateReflectionColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseReflection")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_ReflectionColor", TargetTemplateOption.ReflectionColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateMatCap1Color) {
+			if (TargetTemplateOption.UpdateMatCap1Color && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseMatCap")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_MatCapColor", TargetTemplateOption.MatCap1Color)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateMatCap2Color) {
+			if (TargetTemplateOption.UpdateMatCap2Color && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseMatCap2nd")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_MatCap2ndColor", TargetTemplateOption.MatCap2Color)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateRimLightColor) {
+			if (TargetTemplateOption.UpdateRimLightColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseRim")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_RimColor", TargetTemplateOption.RimLightColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateGlitterColor) {
+			if (TargetTemplateOption.UpdateGlitterColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseGlitter")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_GlitterColor", TargetTemplateOption.GlitterColor)) IsModified = true;
 			}
-			if (TargetTemplateOption.UpdateOutlineColor) {
+			if (TargetTemplateOption.UpdateOutlineColor && MaterialUtility.IsPropertyActive(ReferenceMaterial, "_UseOutline")) {
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_OutlineColor", TargetTemplateOption.OutlineColor)) IsModified = true;
 				if (MaterialUtility.SetColorProperty(TargetMaterial, "_OutlineLitColor", TargetTemplateOption.OutlineHighlightColor)) IsModified = true;
 			}
