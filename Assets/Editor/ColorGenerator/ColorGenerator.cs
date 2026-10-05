@@ -24,6 +24,7 @@ namespace Macchiato.Utility {
 		[SerializeField] GameObject AvatarGameObject;
 		[SerializeField] Material SourceMaterial;
 		[SerializeField] Material[] TargetMaterials = new Material[0];
+		[SerializeField] bool CheckActive = true;
 
 		[SerializeField] ColorProfile TargetColorProfile;
 
@@ -38,6 +39,7 @@ namespace Macchiato.Utility {
 		SerializedProperty SerializedAvatarGameObject;
 		SerializedProperty SerializedSourceMaterial;
 		SerializedProperty SerializedTargetMaterials;
+		SerializedProperty SerializedCheckActive;
 
 		const string ColorProfilePath = "Caramel_Macchiato/ColorGenerator";
 		const string UndoGroupName = "Macchiato ColorGenerator";
@@ -71,7 +73,7 @@ namespace Macchiato.Utility {
 		[MenuItem("Tools/Macchiato/Utility/ColorGenerator", priority = 1000)]
 		static void CreateWindow() {
 			ColorGenerator AppWindow = GetWindow<ColorGenerator>(true, "Macchiato ColorGenerator", true);
-			AppWindow.minSize = new Vector2(550, 500);
+			AppWindow.minSize = new Vector2(550, 515);
 			AppWindow.maxSize = new Vector2(550, 1000);
 			AppWindow.Initialize();
 		}
@@ -82,6 +84,7 @@ namespace Macchiato.Utility {
 			SerializedAvatarGameObject = SerializedColorGenerator.FindProperty(nameof(AvatarGameObject));
 			SerializedSourceMaterial = SerializedColorGenerator.FindProperty(nameof(SourceMaterial));
 			SerializedTargetMaterials = SerializedColorGenerator.FindProperty(nameof(TargetMaterials));
+			SerializedCheckActive = SerializedColorGenerator.FindProperty(nameof(CheckActive));
 			LoadColorProfiles();
 			if (ColorProfiles.Count > 0) {
 				TargetProfileIndex = 0;
@@ -274,6 +277,11 @@ namespace Macchiato.Utility {
 		void DrawMaterialSection() {
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(BorderX);
+			EditorGUILayout.PropertyField(SerializedCheckActive, new GUIContent(GetTranslatedString("String_ApplyValueAfterCheck")));
+			GUILayout.Space(BorderX);
+			GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(BorderX);
 			EditorGUILayout.PropertyField(SerializedTargetMaterials, new GUIContent(GetTranslatedString("String_TargetMaterials")));
 			if (GUILayout.Button(GetTranslatedString("String_Apply"), EditorStyles.miniButtonLeft, GUILayout.Width(60f))) {
 				UpdateMaterials();
@@ -316,7 +324,7 @@ namespace Macchiato.Utility {
 
 		void ExtractMaterialColors() {
 			if (!SourceMaterial || GetShaderType(SourceMaterial) != ShaderType.lilToon) return;
-			if (IsPropertyActive(SourceMaterial, "_UseShadow")) {
+			if (IsPropertyActive(SourceMaterial, "_UseShadow", CheckActive)) {
 				Color SourceShadowColor1 = SourceMaterial.GetColor("_ShadowColor");
 				Color SourceShadowColor2 = SourceMaterial.GetColor("_Shadow2ndColor");
 				Color SourceShadowColor3 = SourceMaterial.GetColor("_Shadow3rdColor");
@@ -324,10 +332,10 @@ namespace Macchiato.Utility {
 				ShadowColor2 = SourceShadowColor2.a != 0f ? SourceShadowColor2 : ShadowColor1;
 				ShadowColor3 = SourceShadowColor3.a != 0f ? SourceShadowColor3 : ShadowColor2;
 			}
-			if (IsPropertyActive(SourceMaterial, "_UseRim")) {
+			if (IsPropertyActive(SourceMaterial, "_UseRim", CheckActive)) {
 				RimLightColor = SourceMaterial.GetColor("_RimColor");
 			}
-			if (IsPropertyActive(SourceMaterial, "_UseRimShade")) {
+			if (IsPropertyActive(SourceMaterial, "_UseRimShade", CheckActive)) {
 				RimShadeColor = SourceMaterial.GetColor("_RimShadeColor");
 			}
 			Repaint();
