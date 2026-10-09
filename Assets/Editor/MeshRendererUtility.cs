@@ -23,8 +23,8 @@ namespace Macchiato.Utility {
 		static int UndoGroupIndex;
 
 		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Update Renderer Setting", priority = 1000)]
-		static void UpdateAvatarRenders() {
-			RequestUpdateAvatarRenders();
+		static void UpdateAvatarRenderers() {
+			RequestUpdateAvatarRenderers();
 		}
 
 		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Adjust Bound Box", priority = 1100)]
@@ -54,7 +54,7 @@ namespace Macchiato.Utility {
 		}
 		#endif
 
-		static void RequestUpdateAvatarRenders() {
+		static void RequestUpdateAvatarRenderers() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
 			if (AvatarGameObjects.Length == 0) return;
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
