@@ -4,7 +4,8 @@
     "references": [
         "GUID:5718fb738711cd34ea54e9553040911d",
         "GUID:bb181fafa659999449e5ae1cc590f407",
-        "GUID:73dfdb5c996426d4fb80b979f581acdd"
+        "GUID:73dfdb5c996426d4fb80b979f581acdd",
+        "GUID:fc900867c0f47cd49b6e2ae4ef907300"
     ],
     "includePlatforms": [
         "Editor"
@@ -15,6 +16,12 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "nadena.dev.modular-avatar",
+            "expression": "",
+            "define": "MODULAR_AVATAR"
+        }
+    ],
     "noEngineReferences": false
 }

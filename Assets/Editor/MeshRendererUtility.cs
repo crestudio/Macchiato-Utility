@@ -6,6 +6,10 @@ using UnityEngine.Rendering;
 
 using Macchiato.Core;
 
+#if MODULAR_AVATAR
+using nadena.dev.modular_avatar.core;
+#endif
+
 /*
  * Macchiato Utility
  * Contact : crestudioplus@gmail.com // Twitter : https://twitter.com/VRC_Macchiato
@@ -42,6 +46,13 @@ namespace Macchiato.Utility {
 		static void UpdateTwosidedShadow() {
 			RequestUpdateTwosidedShadow();
 		}
+
+		#if MODULAR_AVATAR
+		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Update MA Mesh Settings", priority = 1100)]
+		static void UpdateMeshSettings() {
+			RequestUpdateMeshSettings();
+		}
+		#endif
 
 		static void RequestUpdateAvatarRenders() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
@@ -108,6 +119,31 @@ namespace Macchiato.Utility {
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
+				#if MODULAR_AVATAR
+				ModularAvatarMeshSettings[] MeshSettingComponents = AvatarGameObject.GetComponentsInChildren<ModularAvatarMeshSettings>(true);
+				foreach (ModularAvatarMeshSettings TargetMeshSetting in MeshSettingComponents) {
+					if (TargetMeshSetting.InheritProbeAnchor != ModularAvatarMeshSettings.InheritMode.SetOrInherit) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.InheritProbeAnchor = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+					if (AvatarAnchorOverride && TargetMeshSetting.ProbeAnchor != new AvatarObjectReference(AvatarAnchorOverride.gameObject)) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.ProbeAnchor = new AvatarObjectReference(AvatarAnchorOverride.gameObject);
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+					if (TargetMeshSetting.InheritBounds != ModularAvatarMeshSettings.InheritMode.SetOrInherit) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.InheritBounds = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+					if (TargetMeshSetting.Bounds != NewBounds) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.Bounds = NewBounds;
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+				}
+				#endif
 				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Renderer Settings");
 			}
 		}
@@ -223,6 +259,47 @@ namespace Macchiato.Utility {
 				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Shadow Casting Mode");
 			}
 		}
+
+		#if MODULAR_AVATAR
+		static void RequestUpdateMeshSettings() {
+			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
+			if (AvatarGameObjects.Length == 0) return;
+			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
+			foreach (GameObject AvatarGameObject in AvatarGameObjects) {
+				if (!AvatarGameObject) continue;
+				ModularAvatarMeshSettings[] MeshSettingComponents = AvatarGameObject.GetComponentsInChildren<ModularAvatarMeshSettings>(true);
+				if (MeshSettingComponents.Length == 0) continue;
+				Bounds NewBounds = new Bounds {
+					center = new Vector3(0.0f, 0.0f, 0.0f),
+					extents = new Vector3(1.0f, 1.0f, 1.0f),
+				};
+				Transform AvatarAnchorOverride = AvatarUtility.GetAvatarAnchorOverride(AvatarGameObject);
+				foreach (ModularAvatarMeshSettings TargetMeshSetting in MeshSettingComponents) {
+					if (TargetMeshSetting.InheritProbeAnchor != ModularAvatarMeshSettings.InheritMode.SetOrInherit) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.InheritProbeAnchor = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+					if (AvatarAnchorOverride && TargetMeshSetting.ProbeAnchor != new AvatarObjectReference(AvatarAnchorOverride.gameObject)) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.ProbeAnchor = new AvatarObjectReference(AvatarAnchorOverride.gameObject);
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+					if (TargetMeshSetting.InheritBounds != ModularAvatarMeshSettings.InheritMode.SetOrInherit) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.InheritBounds = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+					if (TargetMeshSetting.Bounds != NewBounds) {
+						Undo.RecordObject(TargetMeshSetting, UndoGroupName);
+						TargetMeshSetting.Bounds = NewBounds;
+						Undo.CollapseUndoOperations(UndoGroupIndex);
+					}
+				}
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} MA Mesh Settings");
+			}
+		}
+		#endif
 
 		static Transform GetAnchorOverride(GameObject TargetGameObject) {
 			GameObject TargetHeadGameObject = AvatarUtility.GetHeadGameObject(TargetGameObject);
