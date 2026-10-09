@@ -28,9 +28,9 @@ namespace Macchiato.Utility {
 			RequestUpdateBounds();
 		}
 
-		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Change to Two-Sided Shadow", priority = 1100)]
-		static void UpdateTwosidedShadow() {
-			RequestUpdateTwosidedShadow();
+		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Assign AnchorOverride", priority = 1100)]
+		static void UpdateAnchorOverride() {
+			RequestUpdateAnchorOverride();
 		}
 
 		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Change Probes Settings", priority = 1100)]
@@ -38,12 +38,12 @@ namespace Macchiato.Utility {
 			RequestUpdateProbes();
 		}
 
-		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Assign AnchorOverride", priority = 1100)]
-		static void UpdateAnchorOverride() {
-			RequestUpdateAnchorOverride();
+		[MenuItem("Tools/Macchiato/Utility/MeshRenderer/Change to Two-Sided Shadow", priority = 1100)]
+		static void UpdateTwosidedShadow() {
+			RequestUpdateTwosidedShadow();
 		}
 
-		public static void RequestUpdateAvatarRenders() {
+		static void RequestUpdateAvatarRenders() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
 			if (AvatarGameObjects.Length == 0) return;
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
@@ -112,7 +112,7 @@ namespace Macchiato.Utility {
 			}
 		}
 
-		public static void RequestUpdateBounds() {
+		static void RequestUpdateBounds() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
 			if (AvatarGameObjects.Length == 0) return;
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
@@ -137,32 +137,34 @@ namespace Macchiato.Utility {
 			}
 		}
 
-		public static void RequestUpdateTwosidedShadow() {
+		static void RequestUpdateAnchorOverride() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
 			if (AvatarGameObjects.Length == 0) return;
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			foreach (GameObject AvatarGameObject in AvatarGameObjects) {
 				if (!AvatarGameObject) continue;
+				Transform AvatarAnchorOverride = AvatarUtility.GetAvatarAnchorOverride(AvatarGameObject);
+				if (!AvatarAnchorOverride) AvatarAnchorOverride = GetAnchorOverride(AvatarGameObject);
 				(SkinnedMeshRenderer[] AvatarSkinnedMeshRenderers, MeshRenderer[] AvatarMeshRenderers) = GetAvatarRenderers(AvatarGameObject);
 				foreach (SkinnedMeshRenderer TargetSkinnedMeshRenderer in AvatarSkinnedMeshRenderers) {
-					if (TargetSkinnedMeshRenderer.shadowCastingMode != ShadowCastingMode.TwoSided) {
+					if (TargetSkinnedMeshRenderer.probeAnchor != AvatarAnchorOverride) {
 						Undo.RecordObject(TargetSkinnedMeshRenderer, UndoGroupName);
-						TargetSkinnedMeshRenderer.shadowCastingMode = ShadowCastingMode.TwoSided;
+						TargetSkinnedMeshRenderer.probeAnchor = AvatarAnchorOverride;
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
 				foreach (MeshRenderer TargetMeshRenderer in AvatarMeshRenderers) {
-					if (TargetMeshRenderer.shadowCastingMode != ShadowCastingMode.TwoSided) {
+					if (TargetMeshRenderer.probeAnchor != AvatarAnchorOverride) {
 						Undo.RecordObject(TargetMeshRenderer, UndoGroupName);
-						TargetMeshRenderer.shadowCastingMode = ShadowCastingMode.TwoSided;
+						TargetMeshRenderer.probeAnchor = AvatarAnchorOverride;
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Shadow Casting Mode");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} AnchorOverride");
 			}
 		}
 
-		public static void RequestUpdateProbes() {
+		static void RequestUpdateProbes() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
 			if (AvatarGameObjects.Length == 0) return;
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
@@ -197,35 +199,29 @@ namespace Macchiato.Utility {
 			}
 		}
 
-		public static void RequestUpdateAnchorOverride() {
+		static void RequestUpdateTwosidedShadow() {
 			GameObject[] AvatarGameObjects = AvatarUtility.GetAvatarGameObjects();
 			if (AvatarGameObjects.Length == 0) return;
 			UndoGroupIndex = UnityUtility.InitializeUndoGroup(UndoGroupName);
 			foreach (GameObject AvatarGameObject in AvatarGameObjects) {
 				if (!AvatarGameObject) continue;
-				Transform AvatarAnchorOverride = AvatarUtility.GetAvatarAnchorOverride(AvatarGameObject);
-				if (!AvatarAnchorOverride) AvatarAnchorOverride = GetAnchorOverride(AvatarGameObject);
 				(SkinnedMeshRenderer[] AvatarSkinnedMeshRenderers, MeshRenderer[] AvatarMeshRenderers) = GetAvatarRenderers(AvatarGameObject);
 				foreach (SkinnedMeshRenderer TargetSkinnedMeshRenderer in AvatarSkinnedMeshRenderers) {
-					if (TargetSkinnedMeshRenderer.probeAnchor != AvatarAnchorOverride) {
+					if (TargetSkinnedMeshRenderer.shadowCastingMode != ShadowCastingMode.TwoSided) {
 						Undo.RecordObject(TargetSkinnedMeshRenderer, UndoGroupName);
-						TargetSkinnedMeshRenderer.probeAnchor = AvatarAnchorOverride;
+						TargetSkinnedMeshRenderer.shadowCastingMode = ShadowCastingMode.TwoSided;
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
 				foreach (MeshRenderer TargetMeshRenderer in AvatarMeshRenderers) {
-					if (TargetMeshRenderer.probeAnchor != AvatarAnchorOverride) {
+					if (TargetMeshRenderer.shadowCastingMode != ShadowCastingMode.TwoSided) {
 						Undo.RecordObject(TargetMeshRenderer, UndoGroupName);
-						TargetMeshRenderer.probeAnchor = AvatarAnchorOverride;
+						TargetMeshRenderer.shadowCastingMode = ShadowCastingMode.TwoSided;
 						Undo.CollapseUndoOperations(UndoGroupIndex);
 					}
 				}
-				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} AnchorOverride");
+				Debug.Log($"[Macchiato] Changed {AvatarGameObject.name} Shadow Casting Mode");
 			}
-		}
-
-		static (SkinnedMeshRenderer[], MeshRenderer[]) GetAvatarRenderers(GameObject TargetGameObject) {
-			return (TargetGameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true), TargetGameObject.GetComponentsInChildren<MeshRenderer>(true));
 		}
 
 		static Transform GetAnchorOverride(GameObject TargetGameObject) {
@@ -244,6 +240,10 @@ namespace Macchiato.Utility {
 				}
 			}
 			return null;
+		}
+
+		static (SkinnedMeshRenderer[], MeshRenderer[]) GetAvatarRenderers(GameObject TargetGameObject) {
+			return (TargetGameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true), TargetGameObject.GetComponentsInChildren<MeshRenderer>(true));
 		}
 	}
 }
